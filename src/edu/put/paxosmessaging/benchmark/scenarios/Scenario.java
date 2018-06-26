@@ -11,6 +11,7 @@ public abstract class Scenario {
 
     private final Object commitLock = new Object();
 
+
     public Scenario(String[] params) {
     }
 
@@ -23,6 +24,17 @@ public abstract class Scenario {
     }
 
     protected abstract  void runBenchmark(boolean isMaster);
+
+    protected void makeSnapshot() {
+        synchronized (commitLock) {
+            PaxosSTM.getInstance().scheduleCheckpoint();
+            try {
+                commitLock.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     private void initCommitListener() {
         PaxosSTM.getInstance().addCheckpointListener(new CheckpointListener() {
@@ -37,16 +49,5 @@ public abstract class Scenario {
                 }
             }
         });
-    }
-
-    private void makeSnapshot() {
-        synchronized (commitLock) {
-            PaxosSTM.getInstance().scheduleCheckpoint();
-            try {
-                commitLock.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }

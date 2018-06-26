@@ -28,7 +28,7 @@ public class Main {
                 new Command("ls", "-la")
         };
 
-        String directoryName = "test-runner";
+        String directoryName = "scenario-out-test-benchmark";
         BenchmarkRunner.createDirectoryIfNotExists(directoryName);
 
         int[] timeouts = new int[processesNo];

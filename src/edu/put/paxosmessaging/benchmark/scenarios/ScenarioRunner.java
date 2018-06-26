@@ -9,8 +9,7 @@ import java.util.Arrays;
 public class ScenarioRunner {
     static void main(String[] args) throws StorageException {
 
-        PaxosSTM paxos = PaxosSTM.getInstance();
-        paxos.start();
+        PaxosSTM.getInstance().start();
 
         try {
             String oracleParameter = args[0];
@@ -19,12 +18,12 @@ public class ScenarioRunner {
             e.printStackTrace();
         }
 
-        // TODO: Prepare scenario factory instead of instantiating specific one
+        // TODO: Prepare scenario factory instead of instantiating specific one scenario
         Scenario scenario = new SimpleScenario(Arrays.copyOfRange(args, 1, args.length));
         scenario.run();
 
-        Runtime.getRuntime().gc();
-        paxos.enterBarrier("exit", PaxosSTM.getInstance().getNumberOfNodes());
+        System.gc();
+        PaxosSTM.getInstance().enterBarrier("exit", PaxosSTM.getInstance().getNumberOfNodes());
         TransactionOracle.getInstance().printDebugStats();
     }
 
