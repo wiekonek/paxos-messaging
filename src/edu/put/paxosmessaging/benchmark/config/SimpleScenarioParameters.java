@@ -9,11 +9,13 @@ public class SimpleScenarioParameters implements Externalizable {
     public int requestsNo;
     public int threadsNo;
     public int nodesNo;
+    public int replicaId;
 
-    public SimpleScenarioParameters(int requestsNo, int threadsNo, int nodesNo) {
+    public SimpleScenarioParameters(int requestsNo, int threadsNo, int nodesNo, int replicaId) {
         this.requestsNo = requestsNo;
         this.threadsNo = threadsNo;
         this.nodesNo = nodesNo;
+        this.replicaId = replicaId;
     }
 
     public SimpleScenarioParameters() {
@@ -24,6 +26,7 @@ public class SimpleScenarioParameters implements Externalizable {
         out.writeInt(requestsNo);
         out.writeInt(threadsNo);
         out.writeInt(nodesNo);
+        out.writeInt(replicaId);
     }
 
     @Override
@@ -31,5 +34,6 @@ public class SimpleScenarioParameters implements Externalizable {
         requestsNo = in.readInt();
         threadsNo = in.readInt();
         nodesNo = in.readInt();
+        replicaId = in .readInt();
     }
 }

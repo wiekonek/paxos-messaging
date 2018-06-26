@@ -7,9 +7,6 @@ import soa.paxosstm.dstm.TransactionObject;
 public class TInt {
     private int _int;
 
-    public TInt() {
-    }
-
     public TInt(int value) {
         _int = value;
     }

@@ -6,7 +6,6 @@ import soa.paxosstm.dstm.PaxosSTM;
 import soa.paxosstm.dstm.Transaction;
 import tools.Tools;
 
-
 public class SimpleScenario extends Scenario {
     private final SimpleScenarioParameters[] _paramArray;
 
