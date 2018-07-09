@@ -15,7 +15,7 @@ public abstract class Scenario {
     public Scenario(String[] params) {
     }
 
-    public void run() {
+    public void run() throws InterruptedException {
         initCommitListener();
 
         runBenchmark(PaxosSTM.getInstance().getId() == 0);
@@ -23,7 +23,7 @@ public abstract class Scenario {
         makeSnapshot();
     }
 
-    protected abstract  void runBenchmark(boolean isMaster);
+    protected abstract  void runBenchmark(boolean isMaster) throws InterruptedException;
 
     protected void makeSnapshot() {
         synchronized (commitLock) {

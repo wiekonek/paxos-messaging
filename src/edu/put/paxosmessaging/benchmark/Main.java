@@ -4,9 +4,11 @@ import commands.Command;
 import commands.SshCommand;
 import commands.paxosstm.Parameters;
 import commands.paxosstm.PaxosSTMTestCommand;
-import edu.put.paxosmessaging.benchmark.config.*;
-import tests.paxosstm.EnvironmentConf;
+import edu.put.paxosmessaging.benchmark.config.SimpleScenarioParameters;
+import edu.put.paxosmessaging.benchmark.config.SshLocalEnvironment;
+import edu.put.paxosmessaging.benchmark.scenarios.ScenarioRunner;
 import runners.BenchmarkRunner;
+import tests.paxosstm.EnvironmentConf;
 import tools.Tools;
 
 import java.io.IOException;
@@ -24,35 +26,15 @@ public class Main {
         int nodesNo = Integer.parseInt(args[0]);
         int threadsPerNode = Integer.parseInt(args[1]);
 
+        Parameters.WORKSPACE = "/home/wiekonek/Documents/magisterka-local/paxosstm-all";
+        Parameters.SYSTEM_PROPERTIES = "-Dlogback.configurationFile=file:///home/wiekonek/Documents/magisterka-local/paxosstm-all/PaxosSTM/logback.xml";
+        Parameters.JVM_SETTINGS = "-Xmx256m -Xms256m -Xmn128m";
+
         EnvironmentConf env = new SshLocalEnvironment("wiekonek", nodesNo);
         System.out.println("Config:");
         System.out.println(env.confString);
 
-
-
-//        Command[] commands;
-//        commands = new Command[]{
-//                new Command("pwd"),
-//                new Command("ls", "-la")
-//        };
-//
-//        String directoryName = "scenario-out-test-benchmark";
-//        BenchmarkRunner.createDirectoryIfNotExists(directoryName);
-//
-//        int[] timeouts = new int[nodesNo];
-//        String[] errFile =  new String[nodesNo];
-//        String[] outFile = new String[nodesNo];
-//
-//        for (int i = 0; i < nodesNo; i++) {
-//            errFile[i] = directoryName + "/out" + i + ".err.txt";
-//            outFile[i] = directoryName + "/out" + i + ".txt";
-//            timeouts[i] = 10000;
-//        }
-//
-//        System.out.println(commands[0].getCommand());
-
         String[] loginsAtHosts = env.loginsAtHosts;
-
 
         String directoryName = "scenario-out-01";
         String filename = "out";
@@ -73,7 +55,6 @@ public class Main {
 
         String[] encodedParameters = new String[parameters.length + 1];
 
-        // TODO: ??>
         encodedParameters[0] = "DeferredUpdateOracle";
 
         for (int i = 0; i < parameters.length; i++)
@@ -85,11 +66,20 @@ public class Main {
 
             parameters[0].replicaId = replicaId;
 
-            outFilenames[i] = directoryName + "/" + filename;
-            errFilenames[i] = directoryName + "/" + filename + "-err";
-
+            outFilenames[i] = directoryName + "/" + filename + i + ".txt";
+            errFilenames[i] = directoryName + "/" + filename + i + "-err.txt";
+            System.out.println(ScenarioRunner.class);
             PaxosSTMTestCommand paxosstmTestCommand = new PaxosSTMTestCommand(
-                    "edu.put.paxosmessaging.benchmark.scenarios.ScenarioRunner", encodedParameters, replicaId, env.confString);
+                    "edu.put.paxosmessaging.benchmark.scenarios.ScenarioRunner" /*ScenarioRunner.class.toString()*/,
+                    encodedParameters,
+                    replicaId,
+                    env.confString,
+                    new String[]{
+                            Parameters.WORKSPACE + "/PaxosMessaging/bin/production/PaxosMessaging",
+                            Parameters.WORKSPACE + "/BenchmarkRunner/bin"
+                    },
+                    null
+            );
             Command execCommand = new Command(
                     "cd " + Parameters.getPaxosSTMConfFiles() + "; " + paxosstmTestCommand.toString() + ";"
             );
@@ -98,11 +88,10 @@ public class Main {
                     Arrays.asList("bash -ic \"" + execCommand.toString() + "\""));
 
             commands[i] = loginsAtHosts[i] == null || loginsAtHosts[i].equals("localhost") ? bashCommand : sshCommand;
-            timeouts[i] = 1000;
+            timeouts[i] = 10000;
         }
 
         System.out.println(commands[0].getCommand());
-
 
 
         BenchmarkRunner.runConcurrentCommands(commands, timeouts, outFilenames, errFilenames, 1);

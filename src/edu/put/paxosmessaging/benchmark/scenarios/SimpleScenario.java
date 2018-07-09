@@ -2,6 +2,7 @@ package edu.put.paxosmessaging.benchmark.scenarios;
 
 import edu.put.paxosmessaging.benchmark.config.SimpleScenarioParameters;
 import edu.put.paxosmessaging.core.TInt;
+
 import soa.paxosstm.dstm.PaxosSTM;
 import soa.paxosstm.dstm.Transaction;
 import tools.Tools;
@@ -24,12 +25,14 @@ public class SimpleScenario extends Scenario {
     }
 
     @Override
-    protected void runBenchmark(boolean isMaster) {
+    protected void runBenchmark(boolean isMaster) throws InterruptedException {
 
         // TODO: Get threadsNo for specific replica?? Temporary use first params in array
         SimpleScenarioParameters params = _paramArray[0];
+        System.out.println("Start benchmark!");
 
         for (int i = 0; i < 2; i++) {
+            System.out.println("Round: " + i);
             round(isMaster, params);
         }
 
@@ -37,7 +40,8 @@ public class SimpleScenario extends Scenario {
 
     }
 
-    private void round(boolean isMaster, SimpleScenarioParameters params) {
+    private void round(boolean isMaster, SimpleScenarioParameters params) throws InterruptedException {
+
         if(isMaster) {
             new Transaction() {
                 @Override
@@ -62,6 +66,17 @@ public class SimpleScenario extends Scenario {
             threads[i].start();
         }
 
+        for (int i = 0; i < params.threadsNo; i++) {
+            threads[i].join();
+        }
+
         PaxosSTM.getInstance().enterBarrier("stop", params.nodesNo);
+        new Transaction() {
+            @Override
+            public void atomic() {
+                TInt i = (TInt) PaxosSTM.getInstance().getFromSharedObjectRegistry("t_int");
+                System.out.println(i.getInt());
+            }
+        };
     }
 }

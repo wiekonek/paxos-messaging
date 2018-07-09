@@ -7,8 +7,7 @@ import soa.paxosstm.dstm.internal.TransactionOracle;
 import java.util.Arrays;
 
 public class ScenarioRunner {
-    static void main(String[] args) throws StorageException {
-
+    public static void main(String[] args) throws StorageException, InterruptedException {
         PaxosSTM.getInstance().start();
 
         try {
@@ -18,13 +17,16 @@ public class ScenarioRunner {
             e.printStackTrace();
         }
 
+//        String className = SimpleScenario.class;
+//        Class<?> c = Class.forName(className);
+//        c.getConstructor( String.) .newInstance();
+
         // TODO: Prepare scenario factory instead of instantiating specific one scenario
         Scenario scenario = new SimpleScenario(Arrays.copyOfRange(args, 1, args.length));
         scenario.run();
 
         System.gc();
         PaxosSTM.getInstance().enterBarrier("exit", PaxosSTM.getInstance().getNumberOfNodes());
-        TransactionOracle.getInstance().printDebugStats();
     }
 
     private static void initOracle(String oracleType) {

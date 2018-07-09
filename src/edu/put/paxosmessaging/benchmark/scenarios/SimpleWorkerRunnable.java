@@ -18,7 +18,7 @@ public class SimpleWorkerRunnable implements Runnable {
 
     @Override
     public void run() {
-        for (int i = 0; i < _params.requestsNo; i++) {
+        for (int i = 0; i < 2; i++) {
             new Transaction() {
                 @Override
                 public void atomic() {

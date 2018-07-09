@@ -6,9 +6,6 @@ import tests.paxosstm.EnvironmentConf;
 
 public final class SshLocalEnvironment extends EnvironmentConf {
     public SshLocalEnvironment(String login, int numberOfProcesses) {
-        Parameters.WORKSPACE = "/home/wiekonek/Documents/magisterka-local/paxosstm-all";
-        Parameters.SYSTEM_PROPERTIES = "-Dlogback.configurationFile=file:///home/wiekonek/Documents/magisterka-local/paxosstm-all/PaxosSTM/logback.xml";
-        Parameters.JVM_SETTINGS = "-Xmx256m -Xms256m -Xmn128m";
 
         String[] hosts = new String[numberOfProcesses];
         for (int i = 0; i < numberOfProcesses; i++) {
