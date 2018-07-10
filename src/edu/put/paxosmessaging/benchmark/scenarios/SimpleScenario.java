@@ -1,7 +1,7 @@
 package edu.put.paxosmessaging.benchmark.scenarios;
 
 import edu.put.paxosmessaging.benchmark.config.SimpleScenarioParameters;
-import edu.put.paxosmessaging.core.TInt;
+import edu.put.paxosmessaging.core.transactional.TInt;
 
 import soa.paxosstm.dstm.PaxosSTM;
 import soa.paxosstm.dstm.Transaction;
@@ -29,7 +29,6 @@ public class SimpleScenario extends Scenario {
 
         // TODO: Get threadsNo for specific replica?? Temporary use first params in array
         SimpleScenarioParameters params = _paramArray[0];
-        System.out.println("Start benchmark!");
 
         for (int i = 0; i < 2; i++) {
             System.out.println("Round: " + i);
@@ -60,7 +59,7 @@ public class SimpleScenario extends Scenario {
 
         Thread[] threads = new Thread[params.threadsNo];
         for (int i = 0; i < params.threadsNo; i++) {
-            threads[i] = new Thread(new SimpleWorkerRunnable(tInt, params, i));
+            threads[i] = new Thread(new SimpleWorker(tInt, params, i));
         }
         for (int i = 0; i < params.threadsNo; i++) {
             threads[i].start();

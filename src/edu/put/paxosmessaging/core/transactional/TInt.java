@@ -1,4 +1,4 @@
-package edu.put.paxosmessaging.core;
+package edu.put.paxosmessaging.core.transactional;
 
 
 import soa.paxosstm.dstm.TransactionObject;

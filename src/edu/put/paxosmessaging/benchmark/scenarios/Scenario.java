@@ -18,8 +18,9 @@ public abstract class Scenario {
     public void run() throws InterruptedException {
         initCommitListener();
 
+        System.out.println("--- Start benchmark!");
         runBenchmark(PaxosSTM.getInstance().getId() == 0);
-
+        System.out.println("--- End benchmark!");
         makeSnapshot();
     }
 

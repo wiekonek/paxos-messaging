@@ -36,7 +36,7 @@ public class Main {
 
         String[] loginsAtHosts = env.loginsAtHosts;
 
-        String directoryName = "scenario-out-01";
+        String directoryName = "scenario-out-queue-01";
         String filename = "out";
 
         BenchmarkRunner.createDirectoryIfNotExists(directoryName);
@@ -68,9 +68,8 @@ public class Main {
 
             outFilenames[i] = directoryName + "/" + filename + i + ".txt";
             errFilenames[i] = directoryName + "/" + filename + i + "-err.txt";
-            System.out.println(ScenarioRunner.class);
             PaxosSTMTestCommand paxosstmTestCommand = new PaxosSTMTestCommand(
-                    "edu.put.paxosmessaging.benchmark.scenarios.ScenarioRunner" /*ScenarioRunner.class.toString()*/,
+                    ScenarioRunner.class.getName(),
                     encodedParameters,
                     replicaId,
                     env.confString,
@@ -88,7 +87,7 @@ public class Main {
                     Arrays.asList("bash -ic \"" + execCommand.toString() + "\""));
 
             commands[i] = loginsAtHosts[i] == null || loginsAtHosts[i].equals("localhost") ? bashCommand : sshCommand;
-            timeouts[i] = 10000;
+            timeouts[i] = 20000;
         }
 
         System.out.println(commands[0].getCommand());
