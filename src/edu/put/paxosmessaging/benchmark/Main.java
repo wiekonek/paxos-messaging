@@ -36,7 +36,7 @@ public class Main {
 
         String[] loginsAtHosts = env.loginsAtHosts;
 
-        String directoryName = "scenario-out-queue-01";
+        String directoryName = "benchmark-results/scenario-out-queue-01";
         String filename = "out";
 
         BenchmarkRunner.createDirectoryIfNotExists(directoryName);

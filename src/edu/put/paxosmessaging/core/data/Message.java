@@ -1,10 +1,16 @@
 package edu.put.paxosmessaging.core.data;
 
-public class Message {
+import java.io.Serializable;
+
+public class Message implements Serializable {
     private String data;
 
     public Message(String data) {
         this.data = data;
+    }
+
+    public Message(int intData) {
+        this.data = Integer.toString(intData);
     }
 
     public String getData() {
@@ -13,8 +19,6 @@ public class Message {
 
     @Override
     public String toString() {
-        return "Message{" +
-                "data='" + data + '\'' +
-                '}';
+        return data;
     }
 }

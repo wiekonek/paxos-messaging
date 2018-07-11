@@ -1,5 +1,6 @@
 package edu.put.paxosmessaging.benchmark.scenarios;
 
+import edu.put.paxosmessaging.core.transactional.TMessageQueue;
 import soa.paxosstm.dstm.PaxosSTM;
 import soa.paxosstm.dstm.Transaction;
 import soa.paxosstm.utils.TransactionalQueue;
@@ -27,7 +28,7 @@ public class SimpleQueueScenario extends Scenario {
             new Transaction() {
                 @Override
                 public void atomic() {
-                    TransactionalQueue<Integer> tQueue = new TransactionalQueue<>();
+                    TMessageQueue tQueue = new TMessageQueue();
                     PaxosSTM.getInstance().addToSharedObjectRegistry("t_queue", tQueue);
                 }
             };
@@ -37,7 +38,7 @@ public class SimpleQueueScenario extends Scenario {
         PaxosSTM.getInstance().enterBarrier("init", 3);
         makeSnapshot();
 
-        TransactionalQueue<Integer> tQueue = (TransactionalQueue<Integer>) PaxosSTM.getInstance().getFromSharedObjectRegistry("t_queue");
+        TMessageQueue tQueue = (TMessageQueue) PaxosSTM.getInstance().getFromSharedObjectRegistry("t_queue");
 
         Thread[] threads = new Thread[2];
         for (int i = 0; i < 2; i++) {
@@ -55,14 +56,8 @@ public class SimpleQueueScenario extends Scenario {
         new Transaction() {
             @Override
             public void atomic() {
-                TransactionalQueue<Integer> queue = (TransactionalQueue<Integer>) PaxosSTM.getInstance().getFromSharedObjectRegistry("t_queue");
-                while(true) {
-                    try{
-                        System.out.println(queue.remove());
-                    } catch (Exception e) {
-                        break;
-                    }
-                }
+                TMessageQueue queue = (TMessageQueue) PaxosSTM.getInstance().getFromSharedObjectRegistry("t_queue");
+                System.out.println(queue);
             }
         };
     }
