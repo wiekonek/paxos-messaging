@@ -1,12 +1,12 @@
 package edu.put.paxosmessaging.benchmark.scenarios;
 
-import edu.put.paxosmessaging.core.transactional.TQueue;
 import soa.paxosstm.dstm.Transaction;
+import soa.paxosstm.utils.TransactionalQueue;
 
 public class SimpleQueueWorker implements Runnable {
-    private TQueue _queue;
+    private TransactionalQueue<Integer>_queue;
 
-    public SimpleQueueWorker(TQueue tQueue) {
+    public SimpleQueueWorker(TransactionalQueue<Integer> tQueue) {
         _queue = tQueue;
     }
 
@@ -17,7 +17,7 @@ public class SimpleQueueWorker implements Runnable {
             public void atomic() {
                 for (int i = 0; i < 5; i++) {
                     System.out.println(">>> " + i);
-                    _queue.Enqueue(i);
+                    _queue.offer(i);
                 }
             }
         };
@@ -25,7 +25,7 @@ public class SimpleQueueWorker implements Runnable {
             @Override
             public void atomic() {
                 for (int i = 0; i < 2; i++) {
-                    System.out.println("<<< " + _queue.Dequeue());
+                    System.out.println("<<< " + _queue.remove());
                 }
             }
         };
@@ -34,7 +34,7 @@ public class SimpleQueueWorker implements Runnable {
             public void atomic() {
                 for (int i = 5; i < 10; i++) {
                     System.out.println(">>> " + i);
-                    _queue.Enqueue(i);
+                    _queue.offer(i);
                 }
             }
         };

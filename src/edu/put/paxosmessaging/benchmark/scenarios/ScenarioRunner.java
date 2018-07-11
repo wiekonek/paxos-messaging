@@ -11,7 +11,7 @@ import java.util.Enumeration;
 public class ScenarioRunner {
     public static void main(String[] args) throws StorageException, InterruptedException {
         PaxosSTM.getInstance().start();
-//        System.out.println("Params: " + String.join(", ", args));
+        System.out.println("Params: " + String.join(", ", args));
         try {
             String oracleParameter = args[0];
             initOracle(oracleParameter);
