@@ -2,26 +2,34 @@ package edu.put.paxosstm.messaging.core.transactional;
 
 import edu.put.paxosstm.messaging.core.MessageConsumer;
 import edu.put.paxosstm.messaging.core.data.Message;
+import soa.paxosstm.dstm.Transaction;
 import soa.paxosstm.dstm.TransactionObject;
+import soa.paxosstm.utils.TransactionalArrayList;
 
-import java.util.ArrayList;
-import java.util.List;
 
 @TransactionObject
 public class TMessageQueueHelper {
 
+    @TransactionObject
     public int currentConsumer = 0;
-    public List<MessageConsumer> consumers;
+
+    private TransactionalArrayList<MessageConsumer> consumers;
 
     public TMessageQueueHelper() {
-        consumers = new ArrayList<>();
+        consumers = new TransactionalArrayList<>();
     }
 
     public void SendMessage(Message msg) {
-        if(consumers.isEmpty())
-            return;
-        consumers.get(currentConsumer).consumeMessage(msg);
-        currentConsumer++;
+        new Transaction() {
+            @Override
+            public void atomic() {
+                if (consumers.isEmpty())
+                    return;
+
+                consumers.get(currentConsumer).consumeMessage(msg);
+                currentConsumer = (currentConsumer + 1) % consumers.size();
+            }
+        };
     }
 
     public void AddConsumer(MessageConsumer consumer) {

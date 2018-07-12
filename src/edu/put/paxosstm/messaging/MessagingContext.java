@@ -1,19 +1,28 @@
 package edu.put.paxosstm.messaging;
 
-import edu.put.paxosstm.messaging.core.queues.FullyTransactionalQueue;
 import edu.put.paxosstm.messaging.core.queues.MQueue;
-import edu.put.paxosstm.messaging.core.topics.MTopic;
-import edu.put.paxosstm.messaging.core.transactional.TMessageQueueOnBidirectionalList;
+import edu.put.paxosstm.messaging.core.queues.SynchronousMessageQueue;
+import edu.put.paxosstm.messaging.core.transactional.TMessageQueueHelper;
 import soa.paxosstm.dstm.PaxosSTM;
 import soa.paxosstm.dstm.Transaction;
 
 public class MessagingContext {
     // TODO: What we need there : (
+
+    /**
+     * Type of queue
+     */
     public enum QueueType {
         FullyTransactional {
             @Override
             public String toString() {
                 return "fully-transactional";
+            }
+        },
+        Synchronous {
+            @Override
+            public String toString() {
+                return "synchronous";
             }
         },
         Simplest {
@@ -43,11 +52,24 @@ public class MessagingContext {
     public MessagingContext() {
     }
 
+
+    /**
+     * Create default type {@link MessagingContext.QueueType#Synchronous} message queue
+     *
+     * @param identifier Unique name of queue (identifying queue instance across all nodes)
+     * @return Return queue identified by specific name
+     */
     public MQueue createQueue(String identifier) {
-        return  createQueue(identifier, QueueType.FullyTransactional);
+        return  createQueue(identifier, QueueType.Synchronous);
     }
 
-
+    /**
+     * Create message queue of given type
+     *
+     * @param identifier Unique name of queue (identifying queue instance across all nodes)
+     * @param type Type of queue
+     * @return Return queue identified by specific name
+     */
     public MQueue createQueue(String identifier, QueueType type) {
         String id = identifier + type;
         new Transaction() {
@@ -56,45 +78,14 @@ public class MessagingContext {
                 PaxosSTM paxos = PaxosSTM.getInstance();
 
                 if (paxos.getFromSharedObjectRegistry(id) == null) {
-                    TMessageQueueOnBidirectionalList queue = new TMessageQueueOnBidirectionalList();
+                    TMessageQueueHelper queue = new TMessageQueueHelper();
                     paxos.addToSharedObjectRegistry(id, queue);
                 }
             }
         };
-        TMessageQueueOnBidirectionalList paxosQueue = (TMessageQueueOnBidirectionalList) PaxosSTM.getInstance().getFromSharedObjectRegistry(id);
-        return new FullyTransactionalQueue(paxosQueue);
+        TMessageQueueHelper transactionalHelper = (TMessageQueueHelper) PaxosSTM.getInstance().getFromSharedObjectRegistry(id);
+        return new SynchronousMessageQueue(transactionalHelper);
     }
 
-    public MTopic createTopic(String identifier) {
-        return createTopic(identifier, TopicType.FullyTransactional);
-    }
-
-    public MTopic createTopic(String identifier, TopicType type) {
-        return null;
-    }
-
-    public <T extends Runnable> void globalTransaction(T atomicAction) {
-        new Transaction() {
-            @Override
-            public void atomic() {
-                atomicAction.run();
-            }
-        };
-    }
-
-    // TODO: Implement using existing transaction from PaxosSTM
-    public static abstract class TransactionBody implements Runnable {
-        protected void commit() {
-            System.out.println("commit");
-        }
-
-        protected void rollback() {
-            System.out.println("rollback");
-        }
-
-        protected void abort() {
-            System.out.println("abort");
-        }
-    }
 
 }

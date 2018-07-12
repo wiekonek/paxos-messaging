@@ -1,8 +1,8 @@
 package edu.put.paxosstm.messaging.benchmark.scenarios;
 
 import edu.put.paxosstm.messaging.benchmark.config.BasicScenarioParameters;
-import edu.put.paxosstm.messaging.core.MessageQueue;
 import edu.put.paxosstm.messaging.MessagingContext;
+import edu.put.paxosstm.messaging.core.queues.MQueue;
 import soa.paxosstm.dstm.PaxosSTM;
 import tools.Tools;
 
@@ -31,23 +31,26 @@ public class MessagingSystemScenario extends Scenario {
     private void round() throws InterruptedException {
 
         MessagingContext context = new MessagingContext();
-        MessageQueue queue = context.createQueue("messages-queue");
+        MQueue queue = context.createQueue("messages-queue");
 
+
+        Thread[] threads = new Thread[6];
+        threads[0] = new Thread(new MessagingSystemConsumerWorker(queue, 0));
+        threads[1] = new Thread(new MessagingSystemConsumerWorker(queue, 1));
+        threads[0].start();
+        threads[1].start();
         PaxosSTM.getInstance().enterBarrier("init", params.nodesNumber);
 
-        Thread[] threads = new Thread[2];
-        for (int i = 0; i < 2; i++) {
-            threads[i] = new Thread(new MessagingSystemWorker(context, i));
+        for (int i = 2; i < 6; i++) {
+            threads[i] = new Thread(new MessagingSystemProducerWorker(queue, i));
         }
-        for (Thread t : threads) {
-            t.start();
+        for(int i = 2; i < 6; i++) {
+            threads[i].start();
         }
         for (Thread t : threads) {
             t.join();
         }
 
         PaxosSTM.getInstance().enterBarrier("stop", params.nodesNumber);
-
-        System.out.println(queue);
     }
 }
