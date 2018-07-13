@@ -6,7 +6,7 @@ import soa.paxosstm.dstm.PaxosSTM;
 
 import java.io.Externalizable;
 
-public abstract class Scenario<T extends Externalizable>  {
+public abstract class Scenario {
 
     private final Object commitLock = new Object();
 

@@ -34,17 +34,17 @@ public class MessagingSystemScenario extends Scenario {
         MQueue queue = context.createQueue("messages-queue");
 
 
-        Thread[] threads = new Thread[6];
+        Thread[] threads = new Thread[4];
         threads[0] = new Thread(new MessagingSystemConsumerWorker(queue, 0));
         threads[1] = new Thread(new MessagingSystemConsumerWorker(queue, 1));
         threads[0].start();
         threads[1].start();
         PaxosSTM.getInstance().enterBarrier("init", params.nodesNumber);
 
-        for (int i = 2; i < 6; i++) {
-            threads[i] = new Thread(new MessagingSystemProducerWorker(queue, i));
+        for (int i = 2; i < 4; i++) {
+            threads[i] = new Thread(new MessagingSystemProducerWorker(context, queue, i));
         }
-        for(int i = 2; i < 6; i++) {
+        for(int i = 2; i < 4; i++) {
             threads[i].start();
         }
         for (Thread t : threads) {

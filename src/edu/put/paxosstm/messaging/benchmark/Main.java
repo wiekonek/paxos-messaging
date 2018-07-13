@@ -6,8 +6,10 @@ import commands.paxosstm.Parameters;
 import commands.paxosstm.PaxosSTMTestCommand;
 import edu.put.paxosstm.messaging.benchmark.config.BasicScenarioParameters;
 import edu.put.paxosstm.messaging.benchmark.config.SshLocalEnvironment;
+import edu.put.paxosstm.messaging.benchmark.scenarios.MessagingSystemScenario;
 import edu.put.paxosstm.messaging.benchmark.scenarios.ScenarioRunner;
 import runners.BenchmarkRunner;
+import soa.paxosstm.dstm.internal.TransactionOracle;
 import tests.paxosstm.EnvironmentConf;
 import tools.Tools;
 
@@ -19,13 +21,13 @@ import java.util.Arrays;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        if (args.length < 2) {
-            System.out.println("Usage: [nodesNo threadsPerNode]");
+        if (args.length < 1) {
+            System.out.println("Usage: [nodesNo]");
             return;
         }
-        System.out.printf("Running with: [nodesNo=%s threadsPerNode=%s]\n", args[0], args[1]);
+        System.out.printf("Running with: [nodesNo=%s]\n", args[0]);
         int nodesNo = Integer.parseInt(args[0]);
-        int threadsPerNode = Integer.parseInt(args[1]);
+
 
         Parameters.WORKSPACE = "/home/wiekonek/Documents/magisterka-local/paxosstm-all";
         Parameters.SYSTEM_PROPERTIES = "-Dlogback.configurationFile=file:///home/wiekonek/Documents/magisterka-local/paxosstm-all/PaxosSTM/logback.xml";
@@ -36,16 +38,16 @@ public class Main {
         System.out.println("Config:");
         System.out.println(env.confString);
 
-        String[] loginsAtHosts = env.loginsAtHosts;
-        String directoryName = "benchmark-results/scenario-out-queue-" + LocalDateTime.now();
-        String filename = "out";
 
+
+        String scenarioClassName = MessagingSystemScenario.class.getSimpleName();
+        String directoryName = "benchmark-results/" + LocalDateTime.now() + "-" + scenarioClassName;
         BenchmarkRunner.createDirectoryIfNotExists(directoryName);
 
-        Command[] commands = new Command[loginsAtHosts.length];
-        int[] timeouts = new int[loginsAtHosts.length];
-        String[] outFilenames = new String[loginsAtHosts.length];
-        String[] errFilenames = new String[loginsAtHosts.length];
+        Command[] commands = new Command[nodesNo];
+        int[] timeouts = new int[nodesNo];
+        String[] outFilenames = new String[nodesNo];
+        String[] errFilenames = new String[nodesNo];
 
 
 //        SimpleScenarioParameters[] parameters = new SimpleScenarioParameters[nodesNo];
@@ -60,19 +62,19 @@ public class Main {
 
 
 
-        for (int i = 0; i < loginsAtHosts.length; i++) {
-            int replicaId = loginsAtHosts[i] != null ? i : -1;
+        for (int i = 0; i < nodesNo; i++) {
 
-            String[] encodedParameters = new String[2];
-            encodedParameters[0] = "DeferredUpdateOracle";
-            encodedParameters[1] = Tools.toString(parameters[i]);
+            String[] encodedParameters = new String[3];
+            encodedParameters[0] = TransactionOracle.DeferredUpdateOracle.class.getSimpleName();
+            encodedParameters[1] = scenarioClassName;
+            encodedParameters[2] = Tools.toString(parameters[i]);
 
-            outFilenames[i] = directoryName + "/" + filename + i + ".txt";
-            errFilenames[i] = directoryName + "/" + filename + i + "-err.txt";
+            outFilenames[i] = directoryName + "/out" + i + ".txt";
+            errFilenames[i] = directoryName + "/out" + i + "-err.txt";
             PaxosSTMTestCommand paxosstmTestCommand = new PaxosSTMTestCommand(
                     ScenarioRunner.class.getName(),
                     encodedParameters,
-                    replicaId,
+                    i,
                     env.confString,
                     new String[]{
                             Parameters.WORKSPACE + "/PaxosMessaging/bin/production/PaxosMessaging",
@@ -84,15 +86,12 @@ public class Main {
                     "cd " + Parameters.getPaxosSTMConfFiles() + "; " + paxosstmTestCommand.toString() + ";"
             );
             Command bashCommand = new Command("bash", "-c", execCommand.toString());
-            SshCommand sshCommand = new SshCommand(null, loginsAtHosts[i],
+            SshCommand sshCommand = new SshCommand(null, env.loginsAtHosts[i],
                     Arrays.asList("bash -ic \"" + execCommand.toString() + "\""));
 
-            commands[i] = loginsAtHosts[i] == null || loginsAtHosts[i].equals("localhost") ? bashCommand : sshCommand;
+            commands[i] = env.loginsAtHosts[i] == null || env.loginsAtHosts[i].equals("localhost") ? bashCommand : sshCommand;
             timeouts[i] = 20000;
         }
-
-        System.out.println(commands[0].getCommand());
-
 
         BenchmarkRunner.runConcurrentCommands(commands, timeouts, outFilenames, errFilenames, 1);
     }

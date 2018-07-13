@@ -4,7 +4,7 @@ import edu.put.paxosstm.messaging.core.data.Message;
 
 import java.io.Serializable;
 
-public class MessageLogger implements  MessageConsumer, Serializable {
+public class MessageLogger implements  MessageConsumer {
 
     private final String prefix;
 

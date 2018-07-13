@@ -9,21 +9,13 @@ public class ScenarioRunner {
         System.out.println("Params: " + String.join(", ", args));
 
         if(args[0] == null) throw new Exception("Missing oracleParameter argument");
-        if(args[1] == null) throw new Exception("Missing params argument");
+        if(args[1] == null) throw new Exception("Missing scenario name");
+        if(args[2] == null) throw new Exception("Missing params argument");
 
-        String oracleParameter = args[0];
-        initOracle(oracleParameter);
+        initOracle(args[0]);
 
-//        TODO: Prepare scenario factory instead of instantiating specific one scenario
-//        String className = SimpleScenario.class;
-//        Class<?> c = Class.forName(className);
-//        c.getConstructor( String.) .newInstance();
-
-//        Scenario scenario = new SimpleScenario(args[1]);
-//        Scenario scenario = new SimpleQueueScenario(args[1]);
-        Scenario scenario = new MessagingSystemScenario(args[1]);
+        Scenario scenario = ScenarioFactory.createScenarioFromSimpleName(args[1], args[2]);
         scenario.run();
-
 
         System.gc();
         PaxosSTM.getInstance().enterBarrier("exit", PaxosSTM.getInstance().getNumberOfNodes());
@@ -33,7 +25,7 @@ public class ScenarioRunner {
         Class<?> c;
         String className = oracleType;
         if (!oracleType.contains("."))
-            className = "soa.paxosstm.dstm.internal.TransactionOracle$" + oracleType;
+            className = TransactionOracle.class.getName() + "$" + oracleType;
 
         TransactionOracle oracle = null;
         try {

@@ -1,8 +1,10 @@
 package edu.put.paxosstm.messaging;
 
 import edu.put.paxosstm.messaging.core.queues.MQueue;
+import edu.put.paxosstm.messaging.core.queues.QueueFacade;
 import edu.put.paxosstm.messaging.core.queues.SynchronousMessageQueue;
 import edu.put.paxosstm.messaging.core.transactional.TMessageQueueHelper;
+import lsr.paxos.core.Paxos;
 import soa.paxosstm.dstm.PaxosSTM;
 import soa.paxosstm.dstm.Transaction;
 
@@ -10,15 +12,10 @@ public class MessagingContext {
     // TODO: What we need there : (
 
     /**
-     * Type of queue
+     * Available types of queues
      */
     public enum QueueType {
-        FullyTransactional {
-            @Override
-            public String toString() {
-                return "fully-transactional";
-            }
-        },
+
         Synchronous {
             @Override
             public String toString() {
@@ -33,11 +30,15 @@ public class MessagingContext {
         }
     }
 
+
+    /**
+     * Available types of topics
+     */
     public enum TopicType {
-        FullyTransactional {
+        Synchronous {
             @Override
             public String toString() {
-                return "fully-transactional";
+                return "synchronous";
             }
         },
         Simplest {
@@ -84,8 +85,47 @@ public class MessagingContext {
             }
         };
         TMessageQueueHelper transactionalHelper = (TMessageQueueHelper) PaxosSTM.getInstance().getFromSharedObjectRegistry(id);
-        return new SynchronousMessageQueue(transactionalHelper);
+
+        QueueFacade queue = new SynchronousMessageQueue(transactionalHelper);
+        new Transaction() {
+            @Override
+            public void atomic() {
+                transactionalHelper.nodeRef.api = queue;
+                transactionalHelper.nodeRef.nodeId = PaxosSTM.getInstance().getId();
+            }
+        };
+        return queue;
     }
 
+
+    /**
+     *
+     *
+     * @param atomicAction action to perform inside global transaction
+     * @param <T> that may be simple {@link Runnable} or {@link TransactionBody}
+     */
+    public <T extends Runnable> void globalTransaction(T atomicAction) {
+        new Transaction() {
+            @Override
+            public void atomic() {
+                atomicAction.run();
+            }
+        };
+    }
+
+    // TODO: Implement using existing transaction from PaxosSTM
+    public static abstract class TransactionBody implements Runnable {
+        protected final void commit() {
+            System.out.println("commit");
+        }
+
+        protected final void rollback() {
+            System.out.println("rollback");
+        }
+
+        protected final void abort() {
+            System.out.println("abort");
+        }
+    }
 
 }

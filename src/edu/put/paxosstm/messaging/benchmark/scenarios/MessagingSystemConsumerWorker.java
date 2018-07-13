@@ -16,6 +16,6 @@ public class MessagingSystemConsumerWorker extends PaxosWorker implements Serial
 
     @Override
     public void run() {
-        queue.RegisterConsumer(new MessageLogger(getId()));
+        queue.registerConsumer(new MessageLogger(getId()));
     }
 }

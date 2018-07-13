@@ -1,4 +1,5 @@
 scenario-out-*/*
+lib
 benchmark-results
 bin
 .idea
