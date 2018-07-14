@@ -1,13 +1,13 @@
 package edu.put.paxosstm.messaging.benchmark.scenarios;
 
 import edu.put.paxosstm.messaging.core.data.Message;
-import edu.put.paxosstm.messaging.core.transactional.TMessageQueueOnBidirectionalList;
+import edu.put.paxosstm.messaging.core.transactional.TBidirectionalMessageList;
 import soa.paxosstm.dstm.Transaction;
 
 public class SimpleQueueWorker extends PaxosWorker {
-    private TMessageQueueOnBidirectionalList _queue;
+    private TBidirectionalMessageList _queue;
 
-    public SimpleQueueWorker(TMessageQueueOnBidirectionalList tQueue, int threadId) {
+    public SimpleQueueWorker(TBidirectionalMessageList tQueue, int threadId) {
         super(threadId);
         _queue = tQueue;
     }

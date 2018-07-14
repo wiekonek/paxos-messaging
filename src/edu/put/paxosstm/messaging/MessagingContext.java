@@ -1,10 +1,8 @@
 package edu.put.paxosstm.messaging;
 
 import edu.put.paxosstm.messaging.core.queues.MQueue;
-import edu.put.paxosstm.messaging.core.queues.QueueFacade;
 import edu.put.paxosstm.messaging.core.queues.SynchronousMessageQueue;
-import edu.put.paxosstm.messaging.core.transactional.TMessageQueueHelper;
-import lsr.paxos.core.Paxos;
+import edu.put.paxosstm.messaging.core.transactional.TBidirectionalMessageList;
 import soa.paxosstm.dstm.PaxosSTM;
 import soa.paxosstm.dstm.Transaction;
 
@@ -79,22 +77,13 @@ public class MessagingContext {
                 PaxosSTM paxos = PaxosSTM.getInstance();
 
                 if (paxos.getFromSharedObjectRegistry(id) == null) {
-                    TMessageQueueHelper queue = new TMessageQueueHelper();
-                    paxos.addToSharedObjectRegistry(id, queue);
+                    TBidirectionalMessageList list = new TBidirectionalMessageList();
+                    paxos.addToSharedObjectRegistry(id, list);
                 }
             }
         };
-        TMessageQueueHelper transactionalHelper = (TMessageQueueHelper) PaxosSTM.getInstance().getFromSharedObjectRegistry(id);
-
-        QueueFacade queue = new SynchronousMessageQueue(transactionalHelper);
-        new Transaction() {
-            @Override
-            public void atomic() {
-                transactionalHelper.nodeRef.api = queue;
-                transactionalHelper.nodeRef.nodeId = PaxosSTM.getInstance().getId();
-            }
-        };
-        return queue;
+        TBidirectionalMessageList transactionalHelper = (TBidirectionalMessageList) PaxosSTM.getInstance().getFromSharedObjectRegistry(id);
+        return new SynchronousMessageQueue(transactionalHelper);
     }
 
 

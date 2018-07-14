@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TMessageQueueOnBidirectionalListTest {
+class TBidirectionalMessageListTest {
 
-    private TMessageQueueOnBidirectionalList queue;
+    private TBidirectionalMessageList queue;
 
     @BeforeEach
     void init() {
-        queue = new TMessageQueueOnBidirectionalList();
+        queue = new TBidirectionalMessageList();
     }
 
     @Test

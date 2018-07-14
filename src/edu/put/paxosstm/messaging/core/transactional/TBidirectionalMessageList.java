@@ -5,11 +5,11 @@ import soa.paxosstm.dstm.TransactionObject;
 
 
 @TransactionObject
-public class TMessageQueueOnBidirectionalList {
+public class TBidirectionalMessageList {
 
     private Node _head;
 
-    public TMessageQueueOnBidirectionalList() {
+    public TBidirectionalMessageList() {
         _head = null;
     }
 

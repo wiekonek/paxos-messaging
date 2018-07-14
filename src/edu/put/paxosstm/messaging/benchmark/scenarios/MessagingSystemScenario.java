@@ -21,7 +21,7 @@ public class MessagingSystemScenario extends Scenario {
     }
 
     protected void runBenchmark(boolean isMaster) throws InterruptedException {
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 4; i++) {
             System.out.println("Round: " + i);
             round();
         }

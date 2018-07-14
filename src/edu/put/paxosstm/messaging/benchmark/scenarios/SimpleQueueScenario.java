@@ -1,6 +1,6 @@
 package edu.put.paxosstm.messaging.benchmark.scenarios;
 
-import edu.put.paxosstm.messaging.core.transactional.TMessageQueueOnBidirectionalList;
+import edu.put.paxosstm.messaging.core.transactional.TBidirectionalMessageList;
 import soa.paxosstm.dstm.PaxosSTM;
 import soa.paxosstm.dstm.Transaction;
 
@@ -26,7 +26,7 @@ public class SimpleQueueScenario extends Scenario {
             new Transaction() {
                 @Override
                 public void atomic() {
-                    TMessageQueueOnBidirectionalList tQueue = new TMessageQueueOnBidirectionalList();
+                    TBidirectionalMessageList tQueue = new TBidirectionalMessageList();
                     PaxosSTM.getInstance().addToSharedObjectRegistry("t_queue", tQueue);
                 }
             };
@@ -36,7 +36,7 @@ public class SimpleQueueScenario extends Scenario {
         PaxosSTM.getInstance().enterBarrier("init", 3);
         makeSnapshot();
 
-        TMessageQueueOnBidirectionalList tQueue = (TMessageQueueOnBidirectionalList) PaxosSTM.getInstance().getFromSharedObjectRegistry("t_queue");
+        TBidirectionalMessageList tQueue = (TBidirectionalMessageList) PaxosSTM.getInstance().getFromSharedObjectRegistry("t_queue");
 
         Thread[] threads = new Thread[2];
         for (int i = 0; i < 2; i++) {
@@ -54,7 +54,7 @@ public class SimpleQueueScenario extends Scenario {
         new Transaction() {
             @Override
             public void atomic() {
-                TMessageQueueOnBidirectionalList queue = (TMessageQueueOnBidirectionalList) PaxosSTM.getInstance().getFromSharedObjectRegistry("t_queue");
+                TBidirectionalMessageList queue = (TBidirectionalMessageList) PaxosSTM.getInstance().getFromSharedObjectRegistry("t_queue");
                 System.out.println(queue);
             }
         };

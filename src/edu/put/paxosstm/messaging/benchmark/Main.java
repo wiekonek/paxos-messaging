@@ -34,7 +34,9 @@ public class Main {
         Parameters.JVM_SETTINGS = "-Xmx256m -Xms256m -Xmn128m";
 
 
+
         EnvironmentConf env = new SshLocalEnvironment("wiekonek", nodesNo);
+        runners.Main.killArray = env.loginsAtHosts;
         System.out.println("Config:");
         System.out.println(env.confString);
 
