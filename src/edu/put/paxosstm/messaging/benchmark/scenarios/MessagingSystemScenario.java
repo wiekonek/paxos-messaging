@@ -21,7 +21,7 @@ public class MessagingSystemScenario extends Scenario {
     }
 
     protected void runBenchmark(boolean isMaster) throws InterruptedException {
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 3; i++) {
             System.out.println("Round: " + i);
             round();
         }
@@ -32,25 +32,29 @@ public class MessagingSystemScenario extends Scenario {
 
         MessagingContext context = new MessagingContext();
         MQueue queue = context.createQueue("messages-queue");
-
-
-        Thread[] threads = new Thread[4];
-        threads[0] = new Thread(new MessagingSystemConsumerWorker(queue, 0));
-        threads[1] = new Thread(new MessagingSystemConsumerWorker(queue, 1));
-        threads[0].start();
-        threads[1].start();
         PaxosSTM.getInstance().enterBarrier("init", params.nodesNumber);
 
-        for (int i = 2; i < 4; i++) {
-            threads[i] = new Thread(new MessagingSystemProducerWorker(context, queue, i));
-        }
-        for(int i = 2; i < 4; i++) {
-            threads[i].start();
-        }
-        for (Thread t : threads) {
-            t.join();
+
+
+        int producersNo = 2;
+        Thread[] producers = new Thread[producersNo];
+        for (int i = 0; i < producersNo; i++) {
+            producers[i] = new Thread(new MessagingSystemProducerWorker(context, queue, i));
+            producers[i].start();
         }
 
+        PaxosSTM.getInstance().enterBarrier("init_producers", params.nodesNumber);
+
+        int consumersNo = 2;
+        Thread[] consumers = new Thread[consumersNo];
+        for (int i = 0; i < consumersNo; i++) {
+            consumers[i] = new Thread(new MessagingSystemConsumerWorker(queue, i));
+            consumers[i].start();
+        }
+
+        for (Thread t : consumers) {
+            t.join();
+        }
         PaxosSTM.getInstance().enterBarrier("stop", params.nodesNumber);
     }
 }

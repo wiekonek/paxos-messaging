@@ -3,11 +3,12 @@ package edu.put.paxosstm.messaging;
 import edu.put.paxosstm.messaging.core.queues.MQueue;
 import edu.put.paxosstm.messaging.core.queues.SynchronousMessageQueue;
 import edu.put.paxosstm.messaging.core.transactional.TBidirectionalMessageList;
+import edu.put.paxosstm.messaging.core.transactional.TInt;
+import lsr.paxos.core.Paxos;
 import soa.paxosstm.dstm.PaxosSTM;
 import soa.paxosstm.dstm.Transaction;
 
 public class MessagingContext {
-    // TODO: What we need there : (
 
     /**
      * Available types of queues
@@ -70,7 +71,8 @@ public class MessagingContext {
      * @return Return queue identified by specific name
      */
     public MQueue createQueue(String identifier, QueueType type) {
-        String id = identifier + type;
+        String id = identifier + "_" + type;
+        String intId = id + "_int";
         new Transaction() {
             @Override
             public void atomic() {

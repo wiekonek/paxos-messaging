@@ -4,13 +4,22 @@ import edu.put.paxosstm.messaging.core.MessageConsumer;
 import edu.put.paxosstm.messaging.core.data.Message;
 import edu.put.paxosstm.messaging.core.transactional.TBidirectionalMessageList;
 import soa.paxosstm.dstm.Transaction;
-import soa.paxosstm.dstm.TransactionStatistics;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SynchronousMessageQueue implements MQueue {
     private final TBidirectionalMessageList tMessageList;
 
+    private final List<MessageConsumer> consumers;
+    private int consumerNo;
+    private int currentConsumer;
+
     public SynchronousMessageQueue(TBidirectionalMessageList tMessageList) {
         this.tMessageList = tMessageList;
+        consumers = new ArrayList<>();
+        currentConsumer = 0;
+        consumerNo = 0;
     }
 
     @Override
@@ -23,35 +32,57 @@ public class SynchronousMessageQueue implements MQueue {
         };
     }
 
+    private void startConsuming(int sleepTime) {
+
+        Thread thread = new Thread(() -> {
+            final Message[] msg = new Message[1];
+            final boolean[] rollback = {false};
+
+            while (true) {
+                new Transaction() {
+                    int retryNo = 0;
+
+                    @Override
+                    public void atomic() {
+                        retryNo++;
+                        msg[0] = tMessageList.Dequeue();
+                        if (msg[0] == null) {
+                            try {
+                                Thread.sleep(sleepTime);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            if (retryNo > 3) {
+                                rollback[0] = true;
+                                rollback();
+                            }
+                            retry();
+                        }
+                    }
+                };
+                if (rollback[0]) {
+                    break;
+                }
+
+                consumers.get(currentConsumer).consumeMessage(msg[0]);
+                currentConsumer = (currentConsumer + 1) % consumerNo;
+
+
+            }
+        });
+        thread.start();
+
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void registerConsumer(MessageConsumer messageConsumer) {
-        final Message[] msg = new Message[1];
-        final boolean[] rollback = {false};
-        while (true) {
-            new Transaction() {
-                int retryNo = 0;
-                @Override
-                public void atomic() {
-                    retryNo++;
-                    msg[0] = tMessageList.Dequeue();
-                    if (msg[0] == null) {
-                        if(retryNo >= 3) {
-                            rollback[0] = true;
-                            rollback();
-                        }
-                        retry();
-                    }
-                }
-            };
-            if(rollback[0]) {
-                break;
-            }
-            messageConsumer.consumeMessage(msg[0]);
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        consumers.add(messageConsumer);
+        consumerNo++;
+        if (consumerNo == 1) startConsuming(100);
     }
 }

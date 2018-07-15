@@ -18,10 +18,11 @@ public class MessagingSystemProducerWorker extends PaxosWorker {
 
     @Override
     public void run() {
-//        context.globalTransaction(() -> {
-            for (int i = 0; i < 4; i++) {
-                queue.sendMessage(new Message(getId() + ": " + i));
+        context.globalTransaction(() -> {
+            for (int i = 0; i < 10; i++) {
+                Message msg = new Message(getId() + ": " + i);
+                queue.sendMessage(msg);
             }
-//        });
+        });
     }
 }

@@ -11,6 +11,9 @@ public class TInt {
         _int = value;
     }
 
+    public int increment() {
+        return ++_int;
+    }
 
     public int getInt() {
         return _int;
