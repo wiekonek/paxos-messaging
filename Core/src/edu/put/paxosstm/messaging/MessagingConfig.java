@@ -1,14 +1,37 @@
 package edu.put.paxosstm.messaging;
 
-import lsr.common.PID;
 import java.util.Arrays;
 
 /**
  * Configuration of PaxosMessaging.
  */
 public class MessagingConfig {
+    public static class Node {
+
+        private final int id;
+        private final String hostname;
+        private final int clientPort;
+        private final int replicaPort;
+
+        public Node(int id, String hostname, int clientPort, int replicaPort) {
+            this.id = id;
+            this.hostname = hostname;
+            this.clientPort = clientPort;
+            this.replicaPort = replicaPort;
+        }
+
+        int getId() {
+            return id;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("process.%d = %s:%d:%d\n",id, hostname, clientPort, replicaPort);
+        }
+    }
+
     final int nodeId;
-    final PID[] nodes;
+    final Node[] nodes;
 
     /**
      * Create configuration for specific node.
@@ -23,10 +46,10 @@ public class MessagingConfig {
      * @param nodeId Id of node (must be in nodes).
      * @param nodes
      */
-    private MessagingConfig(int nodeId, PID[] nodes) {
+    private MessagingConfig(int nodeId, Node[] nodes) {
         this.nodeId = nodeId;
         if(nodes == null) {
-            this.nodes = new PID[0];
+            this.nodes = new Node[0];
         } else {
             this.nodes = nodes;
         }
@@ -42,11 +65,11 @@ public class MessagingConfig {
      * @return Return new {@link MessagingConfig}.
      */
     public MessagingConfig withNode(int nodeId, String hostname, int clientPort, int replicaPort) {
-        PID[] newNodes = new PID[nodes.length + 1];
+        Node[] newNodes = new Node[nodes.length + 1];
         for (int i = 0; i < nodes.length; i++) {
             newNodes[i] = nodes[i];
         }
-        newNodes[nodes.length] = new PID(nodeId, hostname, replicaPort, clientPort);
+        newNodes[nodes.length] = new Node(nodeId, hostname, replicaPort, clientPort);
         return new MessagingConfig(this.nodeId, newNodes);
     }
 
@@ -61,16 +84,8 @@ public class MessagingConfig {
 
     String getConfString() {
         StringBuilder builder = new StringBuilder();
-        for (PID node : nodes) {
-            builder.append(
-                    String.format(
-                            "process.%d = %s:%d:%d\n",
-                            node.getId(),
-                            node.getHostname(),
-                            node.getClientPort(),
-                            node.getReplicaPort()
-                    )
-            );
+        for (Node node : nodes) {
+            builder.append(node);
         }
         // TODO: Temporary add same parameters as in benchmark
         builder.append(

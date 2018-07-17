@@ -1,4 +1,4 @@
-package edu.put.paxosstm.messaging.benchmark.scenarios;
+package benchmark.scenarios;
 
 import edu.put.paxosstm.messaging.core.transactional.TBidirectionalMessageList;
 import soa.paxosstm.dstm.PaxosSTM;

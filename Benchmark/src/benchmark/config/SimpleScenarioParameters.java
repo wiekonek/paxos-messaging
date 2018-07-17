@@ -1,4 +1,4 @@
-package edu.put.paxosstm.messaging.benchmark.config;
+package benchmark.config;
 
 import java.io.Externalizable;
 import java.io.IOException;

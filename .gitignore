@@ -1,6 +1,7 @@
 lib
 benchmark-results
-bin
+out
+results
 xmieci
 .idea
 *.iml

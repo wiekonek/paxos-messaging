@@ -1,6 +1,6 @@
-package edu.put.paxosstm.messaging.benchmark.scenarios;
+package benchmark.scenarios;
 
-import edu.put.paxosstm.messaging.benchmark.config.SimpleScenarioParameters;
+import benchmark.config.SimpleScenarioParameters;
 import edu.put.paxosstm.messaging.core.transactional.TInt;
 import soa.paxosstm.dstm.Transaction;
 

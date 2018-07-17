@@ -1,4 +1,4 @@
-package edu.put.paxosstm.messaging.benchmark.scenarios;
+package benchmark.scenarios;
 
 import edu.put.paxosstm.messaging.core.queues.MQueue;
 import edu.put.paxosstm.messaging.consumers.MessageLogger;

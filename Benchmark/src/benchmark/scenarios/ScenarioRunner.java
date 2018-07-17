@@ -1,8 +1,7 @@
-package edu.put.paxosstm.messaging.benchmark.scenarios;
+package benchmark.scenarios;
 
 import edu.put.paxosstm.messaging.core.utils.OracleInitializer;
 import soa.paxosstm.dstm.PaxosSTM;
-import soa.paxosstm.dstm.internal.TransactionOracle;
 
 public class ScenarioRunner {
     public static void main(String[] args) throws Exception {

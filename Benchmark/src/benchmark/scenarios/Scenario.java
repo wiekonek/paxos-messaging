@@ -1,10 +1,8 @@
-package edu.put.paxosstm.messaging.benchmark.scenarios;
+package benchmark.scenarios;
 
 import soa.paxosstm.common.CheckpointListener;
 import soa.paxosstm.common.Storage;
 import soa.paxosstm.dstm.PaxosSTM;
-
-import java.io.Externalizable;
 
 public abstract class Scenario {
 

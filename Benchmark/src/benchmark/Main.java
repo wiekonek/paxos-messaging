@@ -1,13 +1,13 @@
-package edu.put.paxosstm.messaging.benchmark;
+package benchmark;
 
 import commands.Command;
 import commands.SshCommand;
 import commands.paxosstm.Parameters;
 import commands.paxosstm.PaxosSTMTestCommand;
-import edu.put.paxosstm.messaging.benchmark.config.SshLocalEnvironment;
-import edu.put.paxosstm.messaging.benchmark.scenarios.ScenarioRunner;
-import edu.put.paxosstm.messaging.benchmark.config.BasicScenarioParameters;
-import edu.put.paxosstm.messaging.benchmark.scenarios.MessagingSystemScenario;
+import benchmark.config.SshLocalEnvironment;
+import benchmark.scenarios.ScenarioRunner;
+import benchmark.config.BasicScenarioParameters;
+import benchmark.scenarios.MessagingSystemScenario;
 import runners.BenchmarkRunner;
 import soa.paxosstm.dstm.internal.TransactionOracle;
 import tests.paxosstm.EnvironmentConf;
@@ -79,7 +79,8 @@ public class Main {
                     i,
                     env.confString,
                     new String[]{
-                            Parameters.WORKSPACE + "/PaxosMessaging/bin/production/PaxosMessaging",
+                            Parameters.WORKSPACE + "/PaxosMessaging/out/production/Benchmark",
+                            Parameters.WORKSPACE + "/PaxosMessaging/out/production/Core",
                             Parameters.WORKSPACE + "/BenchmarkRunner/bin"
                     },
                     null

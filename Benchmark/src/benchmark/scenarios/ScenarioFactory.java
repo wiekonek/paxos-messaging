@@ -1,4 +1,4 @@
-package edu.put.paxosstm.messaging.benchmark.scenarios;
+package benchmark.scenarios;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

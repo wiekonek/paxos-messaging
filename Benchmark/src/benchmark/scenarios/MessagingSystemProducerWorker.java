@@ -1,4 +1,4 @@
-package edu.put.paxosstm.messaging.benchmark.scenarios;
+package benchmark.scenarios;
 
 import edu.put.paxosstm.messaging.core.MessagingContext;
 import edu.put.paxosstm.messaging.core.data.Message;

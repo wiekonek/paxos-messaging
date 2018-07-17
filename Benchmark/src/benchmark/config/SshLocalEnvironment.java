@@ -1,4 +1,4 @@
-package edu.put.paxosstm.messaging.benchmark.config;
+package benchmark.config;
 
 import commands.paxosstm.Parameters;
 import runners.BenchmarkRunner;

@@ -16,7 +16,7 @@ public class MessagingEnvironment {
      * This method load PaxosMessaging system and start your {@link MessagingApp} with specified params.
      *
      * @param config Messaging config (specifying nodes and Paxos parameters).
-     * @param app Your aplication class implementing {@link MessagingApp}.
+     * @param app Your application class implementing {@link MessagingApp}.
      * @param params Params for your application (passed to {@link MessagingApp#application(String[])}).
      * @param <T> Your application type.
      */
