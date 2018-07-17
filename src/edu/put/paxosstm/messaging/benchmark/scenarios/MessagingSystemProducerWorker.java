@@ -1,6 +1,6 @@
 package edu.put.paxosstm.messaging.benchmark.scenarios;
 
-import edu.put.paxosstm.messaging.MessagingContext;
+import edu.put.paxosstm.messaging.core.MessagingContext;
 import edu.put.paxosstm.messaging.core.data.Message;
 import edu.put.paxosstm.messaging.core.queues.MQueue;
 

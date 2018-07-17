@@ -1,6 +1,7 @@
-scenario-out-*/*
 lib
 benchmark-results
 bin
+xmieci
 .idea
 *.iml
+MANIFEST.MF

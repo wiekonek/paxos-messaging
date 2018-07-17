@@ -1,8 +1,8 @@
 package edu.put.paxosstm.messaging.core.queues;
 
-import edu.put.paxosstm.messaging.core.MessageConsumer;
-import edu.put.paxosstm.messaging.core.data.Message;
 import edu.put.paxosstm.messaging.core.transactional.TBidirectionalMessageList;
+import edu.put.paxosstm.messaging.consumers.MessageConsumer;
+import edu.put.paxosstm.messaging.core.data.Message;
 import soa.paxosstm.dstm.Transaction;
 
 import java.util.ArrayList;
@@ -30,6 +30,13 @@ public class SynchronousMessageQueue implements MQueue {
                 tMessageList.Enqueue(msg);
             }
         };
+    }
+
+    @Override
+    public void registerConsumer(MessageConsumer messageConsumer) {
+        consumers.add(messageConsumer);
+        consumerNo++;
+        if (consumerNo == 1) startConsuming(100);
     }
 
     private void startConsuming(int sleepTime) {
@@ -77,12 +84,5 @@ public class SynchronousMessageQueue implements MQueue {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void registerConsumer(MessageConsumer messageConsumer) {
-        consumers.add(messageConsumer);
-        consumerNo++;
-        if (consumerNo == 1) startConsuming(100);
     }
 }

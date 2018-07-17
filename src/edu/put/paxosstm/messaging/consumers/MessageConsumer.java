@@ -1,4 +1,4 @@
-package edu.put.paxosstm.messaging.core;
+package edu.put.paxosstm.messaging.consumers;
 
 import edu.put.paxosstm.messaging.core.data.Message;
 

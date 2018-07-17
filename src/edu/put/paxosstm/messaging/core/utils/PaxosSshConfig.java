@@ -1,4 +1,4 @@
-package edu.put.paxosstm.messaging.core.config;
+package edu.put.paxosstm.messaging.core.utils;
 
 public class PaxosSshConfig {
     public static class Host {

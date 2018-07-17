@@ -1,7 +1,7 @@
 package edu.put.paxosstm.messaging.benchmark.scenarios;
 
-import edu.put.paxosstm.messaging.core.MessageLogger;
 import edu.put.paxosstm.messaging.core.queues.MQueue;
+import edu.put.paxosstm.messaging.consumers.MessageLogger;
 
 import java.io.Serializable;
 

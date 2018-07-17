@@ -4,10 +4,10 @@ import commands.Command;
 import commands.SshCommand;
 import commands.paxosstm.Parameters;
 import commands.paxosstm.PaxosSTMTestCommand;
-import edu.put.paxosstm.messaging.benchmark.config.BasicScenarioParameters;
 import edu.put.paxosstm.messaging.benchmark.config.SshLocalEnvironment;
-import edu.put.paxosstm.messaging.benchmark.scenarios.MessagingSystemScenario;
 import edu.put.paxosstm.messaging.benchmark.scenarios.ScenarioRunner;
+import edu.put.paxosstm.messaging.benchmark.config.BasicScenarioParameters;
+import edu.put.paxosstm.messaging.benchmark.scenarios.MessagingSystemScenario;
 import runners.BenchmarkRunner;
 import soa.paxosstm.dstm.internal.TransactionOracle;
 import tests.paxosstm.EnvironmentConf;
@@ -94,7 +94,9 @@ public class Main {
             commands[i] = env.loginsAtHosts[i] == null || env.loginsAtHosts[i].equals("localhost") ? bashCommand : sshCommand;
             timeouts[i] = 20000;
         }
-
+        for (Command cmd : commands) {
+            System.out.println(cmd);
+        }
         BenchmarkRunner.runConcurrentCommands(commands, timeouts, outFilenames, errFilenames, 1);
     }
 }
