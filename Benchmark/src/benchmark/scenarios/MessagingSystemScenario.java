@@ -1,8 +1,6 @@
 package benchmark.scenarios;
 
 import benchmark.config.BasicScenarioParameters;
-import edu.put.paxosstm.messaging.core.MessagingContext;
-import edu.put.paxosstm.messaging.core.queues.MQueue;
 import soa.paxosstm.dstm.PaxosSTM;
 import tools.Tools;
 

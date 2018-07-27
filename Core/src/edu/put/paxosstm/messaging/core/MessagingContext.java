@@ -1,71 +1,33 @@
 package edu.put.paxosstm.messaging.core;
 
-import edu.put.paxosstm.messaging.core.queues.MQueue;
-import edu.put.paxosstm.messaging.core.queues.SynchronousMessageQueue;
-import edu.put.paxosstm.messaging.core.transactional.TBidirectionalMessageList;
-import soa.paxosstm.dstm.PaxosSTM;
+import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
+import edu.put.paxosstm.messaging.core.queue.MQueue;
 import soa.paxosstm.dstm.Transaction;
 
 public class MessagingContext {
 
-    /**
-     * Available types of queues
-     */
-    public enum QueueType {
-        Simple {
-            @Override
-            public String toString() {
-                return "simple";
-            }
-        },
-    }
-
-    /**
-     * Available types of topics
-     */
-    public enum TopicType {
-        Simple {
-            @Override
-            public String toString() {
-                return "simple";
-            }
-        }
-    }
 
     MessagingContext() {
     }
 
     /**
-     * Create default type {@link MessagingContext.QueueType#Simple} message queue.
+     * Create message queue of given type with specified params.
      *
      * @param identifier Unique name of queue (identifying queue instance across all nodes).
+     * @param params Parameters for creating {@link MQueue}
      * @return Return queue identified by specific name.
      */
-    public MQueue createQueue(String identifier) {
-        return createQueue(identifier, QueueType.Simple);
-    }
+    public MQueue createQueue(String identifier, MQueueParams params) throws MessagingException {
+        String id = identifier + "_" + params.getType();
 
-    /**
-     * Create message queue of given type.
-     *
-     * @param identifier Unique name of queue (identifying queue instance across all nodes).
-     * @param type Type of queue.
-     * @return Return queue identified by specific name.
-     */
-    public MQueue createQueue(String identifier, QueueType type) {
-        String id = identifier + "_" + type;
-        new Transaction() {
-            @Override
-            public void atomic() {
-                PaxosSTM paxos = PaxosSTM.getInstance();
-                if (paxos.getFromSharedObjectRegistry(id) == null) {
-                    TBidirectionalMessageList list = new TBidirectionalMessageList();
-                    paxos.addToSharedObjectRegistry(id, list);
-                }
-            }
-        };
-        TBidirectionalMessageList transactionalHelper = (TBidirectionalMessageList) PaxosSTM.getInstance().getFromSharedObjectRegistry(id);
-        return new SynchronousMessageQueue(transactionalHelper);
+        switch (params.getType()) {
+            case Simple:
+                return new SingleMessageQueue(id);
+            case Multi:
+                return new MultiMessageQueue(id, params.getConcurrentQueueNumber());
+        }
+
+        throw new MessagingException("Unidentified queue type");
     }
 
 

@@ -1,6 +1,6 @@
 package benchmark.scenarios;
 
-import edu.put.paxosstm.messaging.core.queues.MQueue;
+import edu.put.paxosstm.messaging.core.queue.MQueue;
 import edu.put.paxosstm.messaging.consumers.MessageLogger;
 
 import java.io.Serializable;

@@ -4,8 +4,11 @@ import soa.paxosstm.dstm.PaxosSTM;
 
 public abstract class MessagingApp {
 
-    protected final MessagingContext messagingContext;
+    /**
+     * Unique id of node.
+     */
     protected final int nodeId;
+    protected final MessagingContext messagingContext;
     private final PaxosSTM paxos;
 
     public MessagingApp() {
@@ -33,8 +36,8 @@ public abstract class MessagingApp {
     }
 
     /**
-     * Log for specific node. Printing '[:nodeId]: <@'
-     * @param log
+     * Log for specific node. Printing '[{@link #nodeId}]: {@literal log}'
+     * @param log Message to log.
      */
     protected void log(String log) {
         System.out.println(String.format("[%d]: %s", nodeId, log));

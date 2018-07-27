@@ -2,7 +2,7 @@ package benchmark.scenarios;
 
 import edu.put.paxosstm.messaging.core.MessagingContext;
 import edu.put.paxosstm.messaging.core.data.Message;
-import edu.put.paxosstm.messaging.core.queues.MQueue;
+import edu.put.paxosstm.messaging.core.queue.MQueue;
 
 public class MessagingSystemProducerWorker extends PaxosWorker {
 

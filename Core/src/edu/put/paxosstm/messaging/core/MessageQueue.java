@@ -1,43 +1,39 @@
-package edu.put.paxosstm.messaging.core.queues;
+package edu.put.paxosstm.messaging.core;
 
-import edu.put.paxosstm.messaging.core.transactional.TBidirectionalMessageList;
 import edu.put.paxosstm.messaging.consumers.MessageConsumer;
 import edu.put.paxosstm.messaging.core.data.Message;
+import edu.put.paxosstm.messaging.core.queue.MQueue;
 import soa.paxosstm.dstm.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SynchronousMessageQueue implements MQueue {
-    private final TBidirectionalMessageList tMessageList;
+public abstract class MessageQueue implements MQueue {
 
     private final List<MessageConsumer> consumers;
     private int consumerNo;
     private int currentConsumer;
+    private final int maxRetryNumber;
 
-    public SynchronousMessageQueue(TBidirectionalMessageList tMessageList) {
-        this.tMessageList = tMessageList;
+    MessageQueue() {
+        this(3);
+    }
+
+    MessageQueue(int maxRetryNumber) {
+        this.maxRetryNumber = maxRetryNumber;
         consumers = new ArrayList<>();
         currentConsumer = 0;
         consumerNo = 0;
     }
 
     @Override
-    public void sendMessage(Message msg) {
-        new Transaction() {
-            @Override
-            public void atomic() {
-                tMessageList.Enqueue(msg);
-            }
-        };
-    }
-
-    @Override
-    public void registerConsumer(MessageConsumer messageConsumer) {
+    public final void registerConsumer(MessageConsumer messageConsumer) {
         consumers.add(messageConsumer);
         consumerNo++;
         if (consumerNo == 1) startConsuming(100);
     }
+
+    protected abstract Message getNextMessage();
 
     private void startConsuming(int sleepTime) {
 
@@ -52,14 +48,16 @@ public class SynchronousMessageQueue implements MQueue {
                     @Override
                     public void atomic() {
                         retryNo++;
-                        msg[0] = tMessageList.Dequeue();
+
+                        msg[0] = getNextMessage();
+
                         if (msg[0] == null) {
                             try {
                                 Thread.sleep(sleepTime);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                            if (retryNo > 3) {
+                            if (retryNo > maxRetryNumber) {
                                 rollback[0] = true;
                                 rollback();
                             }
@@ -70,11 +68,8 @@ public class SynchronousMessageQueue implements MQueue {
                 if (rollback[0]) {
                     break;
                 }
-
                 consumers.get(currentConsumer).consumeMessage(msg[0]);
                 currentConsumer = (currentConsumer + 1) % consumerNo;
-
-
             }
         });
         thread.start();
@@ -85,4 +80,5 @@ public class SynchronousMessageQueue implements MQueue {
             e.printStackTrace();
         }
     }
+
 }
