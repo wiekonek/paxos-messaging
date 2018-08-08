@@ -2,7 +2,6 @@ package edu.put.paxosstm.messaging.core;
 
 import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import edu.put.paxosstm.messaging.core.queue.MQueue;
-import soa.paxosstm.dstm.Transaction;
 
 public class MessagingContext {
 
@@ -31,17 +30,11 @@ public class MessagingContext {
     }
 
 
-    /**
-     * Inside this method you can create transaction.
-     *
-     * @param atomicAction Action to perform inside global transaction.
-     * @param <T> Type may be simple {@link Runnable} or {@link TransactionBody}.
-     */
-    public <T extends Runnable> void globalTransaction(T atomicAction) {
-        new Transaction() {
+    public void transactionAction(Runnable action) {
+        new MessagingTransaction() {
             @Override
             public void atomic() {
-                atomicAction.run();
+                action.run();
             }
         };
     }

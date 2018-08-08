@@ -1,10 +1,8 @@
 package edu.put.paxosstm.messaging.core;
 
 import edu.put.paxosstm.messaging.core.transactional.TBidirectionalMessageList;
-import edu.put.paxosstm.messaging.consumers.MessageConsumer;
 import edu.put.paxosstm.messaging.core.data.Message;
 import soa.paxosstm.dstm.PaxosSTM;
-import soa.paxosstm.dstm.Transaction;
 
 class SingleMessageQueue extends MessageQueue {
     private final TBidirectionalMessageList tMessageList;
@@ -13,7 +11,7 @@ class SingleMessageQueue extends MessageQueue {
 
     SingleMessageQueue(String id) {
         super();
-        new Transaction() {
+        new CoreTransaction() {
             @Override
             public void atomic() {
                 PaxosSTM paxos = PaxosSTM.getInstance();
@@ -28,7 +26,7 @@ class SingleMessageQueue extends MessageQueue {
 
     @Override
     public void sendMessage(Message msg) {
-        new Transaction() {
+        new CoreTransaction() {
             @Override
             public void atomic() {
                 tMessageList.Enqueue(msg);
@@ -39,10 +37,13 @@ class SingleMessageQueue extends MessageQueue {
     @Override
     public Message receiveMessage() {
         final Message[] msg = new Message[1];
-        new Transaction() {
+        new CoreTransaction() {
             @Override
             public void atomic() {
                 msg[0] = tMessageList.Dequeue();
+                if(msg[0] == null) {
+                    retry();
+                }
             }
         };
         return msg[0];

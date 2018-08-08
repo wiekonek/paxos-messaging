@@ -10,20 +10,11 @@ public class ScenarioFactory {
             return new MessagingSystemScenario(params);
         }
 
-        if (scenarioSimpleName.equals(SimpleScenario.class.getSimpleName())) {
-            return new SimpleScenario(params);
-        }
-
-        if(scenarioSimpleName.equals(SimpleQueueScenario.class.getSimpleName())) {
-            return new SimpleQueueScenario(params);
-        }
-
         throw new ClassNotFoundException();
     }
 
     public static Scenario createScenario(String scenarioClassName, String params) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        String className = SimpleScenario.class.getName();
-        Class<?> c = Class.forName(className);
+        Class<?> c = Class.forName(scenarioClassName);
         return (Scenario) c.getConstructor(String.class).newInstance(params);
     }
 }

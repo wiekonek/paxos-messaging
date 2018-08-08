@@ -3,12 +3,13 @@ package edu.put.paxosstm.messaging.core;
 import edu.put.paxosstm.messaging.consumers.MessageConsumer;
 import edu.put.paxosstm.messaging.core.data.Message;
 import edu.put.paxosstm.messaging.core.queue.MQueue;
+import edu.put.paxosstm.messaging.core.utils.TransactionStatisticsCollector;
 import soa.paxosstm.dstm.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class MessageQueue implements MQueue {
+public abstract class MessageQueue extends TransactionStatisticsCollector implements MQueue {
 
     private final List<MessageConsumer> consumers;
     private int consumerNo;
