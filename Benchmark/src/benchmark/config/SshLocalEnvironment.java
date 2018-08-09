@@ -1,6 +1,5 @@
 package benchmark.config;
 
-import commands.paxosstm.Parameters;
 import runners.BenchmarkRunner;
 import tests.paxosstm.EnvironmentConf;
 

@@ -1,5 +1,6 @@
 package edu.put.paxosstm.messaging.core;
 
+import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import soa.paxosstm.dstm.PaxosSTM;
 
 public abstract class MessagingApp {
@@ -9,7 +10,10 @@ public abstract class MessagingApp {
      */
     protected final int nodeId;
     protected final MessagingContext messagingContext;
-    private final PaxosSTM paxos;
+    protected final PaxosSTM paxos;
+    protected int getNodesNo() {
+        return paxos.getNumberOfNodes();
+    }
 
     public MessagingApp() {
         this.messagingContext = new MessagingContext();
@@ -17,7 +21,7 @@ public abstract class MessagingApp {
         this.nodeId = paxos.getId();
     }
 
-    final void runApplication(String[] params) {
+    final void runApplication(String[] params) throws MessagingException, InterruptedException {
         barrier("start_application");
         application(params);
         barrier("end_application");
@@ -28,7 +32,7 @@ public abstract class MessagingApp {
      *
      * @param params Parameters for application
      */
-    public abstract void application(String[] params);
+    public abstract void application(String[] params) throws InterruptedException, MessagingException;
 
 
     protected void barrier(String barrierName) {

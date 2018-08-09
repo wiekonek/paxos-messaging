@@ -7,7 +7,7 @@ public class TransactionStatisticsCollector implements MStatistics {
     public class Statistics {
         public class Stats {
             public int commits;
-            public long committedExecTime;
+            public int committedExecTime;
             public int rollbacks;
             public long rolledExecTime;
             public int localAborts;
@@ -19,25 +19,32 @@ public class TransactionStatisticsCollector implements MStatistics {
 
 
             public String getHeader() {
-                return "| commit | rollba | lAbort | gAbort | retry  |";
+                return "| commit <- time  | rollba <- time  | lAbort <- time  | gAbort <- time  | retry  <- time  ";
             }
 
             @Override
             public String toString() {
-                return String.format("| %06d | %06d | %06d | %06d | %06d |", commits, rollbacks, localAborts, globalAborts, retries);
+                return String.format(
+                        "| %06d < %06d | %06d < %06d | %06d < %06d | %06d < %06d | %06d < %06d ",
+                        commits, committedExecTime, rollbacks, rolledExecTime, localAborts, localAbortedExecTime,
+                        globalAborts, globalAbortedExecTime, retries, retriedExecTime);
             }
         }
 
         public Stats readOnly = new Stats();
         public Stats readWrite = new Stats();
 
-        public String getHeader() {
-            return String.format("%s %s", readWrite.getHeader(), readOnly.getHeader());
-        }
 
-        @Override
-        public String toString() {
-            return String.format("%s %s", readWrite, readOnly);
+        public String getStatisticsLog() {
+            return
+                " -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n" +
+                "|                                                                                      Statistics                                                                                     |\n" +
+                "|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|\n" +
+                "|                                         readWrite                                        |                                         readOnly                                         |\n" +
+                "|------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|\n" +
+                String.format("%s %s |\n", readWrite.getHeader(), readOnly.getHeader()) +
+                String.format("%s %s |\n", readWrite, readOnly);
+
         }
     }
 
@@ -56,16 +63,17 @@ public class TransactionStatisticsCollector implements MStatistics {
                 collectStatistics(statistics, isReadOnly());
             }
         }
+
     }
 
     private final Statistics collectedStatistics = new Statistics();
     public Statistics getCollectedStatistics() {
         return collectedStatistics;
     }
-    // TODO: Change default to false!!!
-    public boolean collectStatistics = true;
 
-    private void  collectStatistics(TransactionStatistics statistics, boolean isReadOnly) {
+    public boolean collectStatistics = false;
+
+    public void  collectStatistics(TransactionStatistics statistics, boolean isReadOnly) {
         Statistics.Stats stats = isReadOnly ? collectedStatistics.readOnly : collectedStatistics.readWrite;
         switch (statistics.getState()) {
             case Committed:

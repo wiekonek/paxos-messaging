@@ -4,7 +4,6 @@ import edu.put.paxosstm.messaging.consumers.MessageConsumer;
 import edu.put.paxosstm.messaging.core.data.Message;
 import edu.put.paxosstm.messaging.core.queue.MQueue;
 import edu.put.paxosstm.messaging.core.utils.TransactionStatisticsCollector;
-import soa.paxosstm.dstm.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +42,7 @@ public abstract class MessageQueue extends TransactionStatisticsCollector implem
             final boolean[] rollback = {false};
 
             while (true) {
-                new Transaction() {
+                new CoreTransaction() {
                     int retryNo = 0;
 
                     @Override

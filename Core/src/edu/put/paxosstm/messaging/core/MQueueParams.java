@@ -5,9 +5,6 @@ import edu.put.paxosstm.messaging.core.queue.MQueueType;
 
 public class MQueueParams {
 
-    private static final int DEFAULT_CONCURRENT_QUEUE = 4;
-    private static final MQueueType DEFAULT_QUEUE_TYPE = MQueueType.Simple;
-
     /**
      * Type of {@link MQueue}
      */

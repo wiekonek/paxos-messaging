@@ -11,7 +11,7 @@ class MultiMessageQueue extends MessageQueue {
     private int currentQueue;
 
     MultiMessageQueue(String id, int concurrentQueueNumber) {
-        super(6);
+        super(concurrentQueueNumber * 3);
         queueNo = concurrentQueueNumber;
         currentQueue = 0;
         String[] ids = new String[concurrentQueueNumber];

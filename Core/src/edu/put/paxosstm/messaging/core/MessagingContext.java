@@ -2,36 +2,24 @@ package edu.put.paxosstm.messaging.core;
 
 import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import edu.put.paxosstm.messaging.core.queue.MQueue;
+import edu.put.paxosstm.messaging.core.utils.TransactionStatisticsCollector;
+import soa.paxosstm.dstm.TransactionStatistics;
 
-public class MessagingContext {
-
-
-    MessagingContext() {
-    }
+public class MessagingContext extends TransactionStatisticsCollector {
 
     /**
      * Create message queue of given type with specified params.
      *
      * @param identifier Unique name of queue (identifying queue instance across all nodes).
-     * @param params Parameters for creating {@link MQueue}
+     * @param params     Parameters for creating {@link MQueue}
      * @return Return queue identified by specific name.
      */
     public MQueue createQueue(String identifier, MQueueParams params) throws MessagingException {
-        String id = identifier + "_" + params.getType();
-
-        switch (params.getType()) {
-            case Simple:
-                return new SingleMessageQueue(id);
-            case Multi:
-                return new MultiMessageQueue(id, params.getConcurrentQueueNumber());
-        }
-
-        throw new MessagingException("Unidentified queue type");
+        return createQueue(identifier, params, false);
     }
 
-
     public void transactionAction(Runnable action) {
-        new MessagingTransaction() {
+        new CoreTransaction() {
             @Override
             public void atomic() {
                 action.run();
@@ -39,6 +27,21 @@ public class MessagingContext {
         };
     }
 
-
+    protected MessageQueue createQueue(String identifier, MQueueParams params, boolean collectStatistics) throws MessagingException {
+        String id = identifier + "_" + params.getType();
+        MessageQueue queue;
+        switch (params.getType()) {
+            case Simple:
+                queue = new SingleMessageQueue(id);
+                break;
+            case Multi:
+                queue = new MultiMessageQueue(id, params.getConcurrentQueueNumber());
+                break;
+            default:
+                throw new MessagingException("Unidentified queue type");
+        }
+        queue.collectStatistics = collectStatistics;
+        return queue;
+    }
 }
 

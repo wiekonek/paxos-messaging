@@ -1,4 +1,4 @@
-package benchmark.scenarios;
+package benchmark.scenarios.workers;
 
 import soa.paxosstm.dstm.PaxosSTM;
 
