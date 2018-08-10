@@ -2,6 +2,7 @@ package benchmark;
 
 import benchmark.config.BasicScenarioParameters;
 import benchmark.scenarios.ProdConsScenario;
+import benchmark.scenarios.ProdConsTopicScenario;
 
 import java.io.IOException;
 
@@ -25,6 +26,13 @@ public class Main {
         switch  (scenarioNo) {
             case 0:
                 scenarioClass = ProdConsScenario.class;
+                parameters = new BasicScenarioParameters[nodesNo];
+                for (int i = 0; i < nodesNo; i++) {
+                    parameters[i] = new BasicScenarioParameters(nodesNo, 3);
+                }
+                break;
+            case 1:
+                scenarioClass = ProdConsTopicScenario.class;
                 parameters = new BasicScenarioParameters[nodesNo];
                 for (int i = 0; i < nodesNo; i++) {
                     parameters[i] = new BasicScenarioParameters(nodesNo, 3);

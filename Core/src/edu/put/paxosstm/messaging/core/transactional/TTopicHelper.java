@@ -23,19 +23,24 @@ public class TTopicHelper {
         tArray = new ArrayWrapper<>(internalArray);
     }
 
+    public MessageWithIndex getNewest() {
+        if (newestIndex == -1) return null;
+        return new MessageWithIndex(tArray.get(newestIndex % bufferSize), newestIndex);
+    }
+
     public MessageWithIndex get(int i) {
-        if(newestIndex == -1 || i > newestIndex) {
+        if (newestIndex == -1 || i > newestIndex) {
             return null;
         }
         int oldest = newestIndex - bufferSize;
         if (i < oldest) {
-            return new MessageWithIndex(tArray.get(oldest), oldest);
+            return new MessageWithIndex(tArray.get(oldest % bufferSize), oldest);
         } else {
-            return  new MessageWithIndex(tArray.get(i), i);
+            return new MessageWithIndex(tArray.get(i % bufferSize), i);
         }
     }
 
-    void add(Message message) {
+    public void add(Message message) {
         newestIndex++;
         tArray.set(newestIndex % bufferSize, message.getData());
     }

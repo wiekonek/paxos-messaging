@@ -39,7 +39,7 @@ public abstract class MessageQueue extends TransactionStatisticsCollector implem
 
         Thread thread = new Thread(() -> {
             final Message[] msg = new Message[1];
-            final boolean[] rollback = {false};
+            final boolean[] exit = {false};
 
             while (true) {
                 new CoreTransaction() {
@@ -58,14 +58,14 @@ public abstract class MessageQueue extends TransactionStatisticsCollector implem
                                 e.printStackTrace();
                             }
                             if (retryNo > maxRetryNumber) {
-                                rollback[0] = true;
+                                exit[0] = true;
                                 rollback();
                             }
                             retry();
                         }
                     }
                 };
-                if (rollback[0]) {
+                if (exit[0]) {
                     break;
                 }
                 consumers.get(currentConsumer).consumeMessage(msg[0]);
