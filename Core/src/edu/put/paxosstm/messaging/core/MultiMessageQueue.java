@@ -3,6 +3,7 @@ package edu.put.paxosstm.messaging.core;
 import edu.put.paxosstm.messaging.core.data.Message;
 import edu.put.paxosstm.messaging.core.transactional.TBidirectionalMessageList;
 import soa.paxosstm.dstm.PaxosSTM;
+import soa.paxosstm.dstm.Transaction;
 
 class MultiMessageQueue extends MessageQueue {
     private final TBidirectionalMessageList[] tMessageLists;
@@ -18,7 +19,7 @@ class MultiMessageQueue extends MessageQueue {
         for (int i = 0; i < concurrentQueueNumber; i++) {
             ids[i] = id + "_" + i;
         }
-        new CoreTransaction() {
+        new Transaction() {
             @Override
             public void atomic() {
                 for (String listId : ids) {

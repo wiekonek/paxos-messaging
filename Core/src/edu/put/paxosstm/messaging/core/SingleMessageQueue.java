@@ -3,6 +3,7 @@ package edu.put.paxosstm.messaging.core;
 import edu.put.paxosstm.messaging.core.transactional.TBidirectionalMessageList;
 import edu.put.paxosstm.messaging.core.data.Message;
 import soa.paxosstm.dstm.PaxosSTM;
+import soa.paxosstm.dstm.Transaction;
 
 class SingleMessageQueue extends MessageQueue {
     private final TBidirectionalMessageList tMessageList;
@@ -11,7 +12,7 @@ class SingleMessageQueue extends MessageQueue {
 
     SingleMessageQueue(String id) {
         super();
-        new CoreTransaction() {
+        new Transaction() {
             @Override
             public void atomic() {
                 PaxosSTM paxos = PaxosSTM.getInstance();

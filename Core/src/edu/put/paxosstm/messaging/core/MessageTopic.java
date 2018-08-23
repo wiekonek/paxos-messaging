@@ -7,6 +7,7 @@ import edu.put.paxosstm.messaging.core.topics.MTopic;
 import edu.put.paxosstm.messaging.core.transactional.TTopicHelper;
 import edu.put.paxosstm.messaging.core.utils.TransactionStatisticsCollector;
 import soa.paxosstm.dstm.PaxosSTM;
+import soa.paxosstm.dstm.Transaction;
 
 public class MessageTopic extends TransactionStatisticsCollector implements MTopic {
 
@@ -19,7 +20,7 @@ public class MessageTopic extends TransactionStatisticsCollector implements MTop
 
     MessageTopic(String id, int maxRetryNumber) {
         this.maxRetryNumber = maxRetryNumber;
-        new CoreTransaction() {
+        new Transaction() {
             @Override
             public void atomic() {
                 PaxosSTM paxos = PaxosSTM.getInstance();
