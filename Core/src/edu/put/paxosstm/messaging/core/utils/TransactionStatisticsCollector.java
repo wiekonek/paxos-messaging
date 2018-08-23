@@ -60,7 +60,9 @@ public class TransactionStatisticsCollector implements MStatistics {
         public final void statistics(TransactionStatistics statistics) {
 
             if(collectStatistics) {
-                collectStatistics(statistics, isReadOnly());
+                synchronized(this) {
+                    collectStatistics(statistics, isReadOnly());
+                }
             }
         }
 
@@ -78,7 +80,7 @@ public class TransactionStatisticsCollector implements MStatistics {
         switch (statistics.getState()) {
             case Committed:
                 stats.commits++;
-                stats.committedExecTime += statistics.getExecutionTime();
+                stats.committedExecTime += statistics.getExecutionTime(); //mili lub micro sekundy
                 break;
             case RolledBack:
                 stats.rollbacks++;
