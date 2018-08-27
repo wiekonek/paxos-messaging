@@ -11,23 +11,17 @@ import static  java.util.Arrays.asList;
 
 @SuppressWarnings("FieldCanBeLocal")
 class BenchmarkArgumentParser {
-    private final String HELP = "help";
 
-    private final String NODES = "nodes";
-    private final String ROUNDS = "rounds";
+    private final OptionSet arguments;
+    private final String[] args;
 
-    private final String SSH = "ssh";
-    private final String SSH_HOSTS = "ssh-hosts";
+    private final AbstractOptionSpec<Void> helpOption;
 
     private final ArgumentAcceptingOptionSpec<Integer> nodesNoOption;
     private final ArgumentAcceptingOptionSpec<Integer> roundsNoOption;
     private final ArgumentAcceptingOptionSpec<String> sshHostOption;
     private final OptionSpecBuilder sshOption;
-
     private final ArgumentAcceptingOptionSpec<AvailableScenarios> scenarioOption;
-
-    private final OptionSet arguments;
-    private final String[] args;
     private final ArgumentAcceptingOptionSpec<Integer> timeoutOption;
     private final ArgumentAcceptingOptionSpec<String> outputFolderOption;
     private final ArgumentAcceptingOptionSpec<String> workspaceOption;
@@ -91,23 +85,23 @@ class BenchmarkArgumentParser {
 
         OptionParser optionParser = new OptionParser();
 
-        optionParser
-                .accepts(HELP, "Show help message")
+        helpOption = optionParser
+                .accepts("help", "Show help message")
                 .forHelp();
 
         nodesNoOption= optionParser
-                .accepts(NODES, "Number of nodes, must be smaller or equal to --ssh-host number")
+                .accepts("nodes", "Number of nodes, must be smaller or equal to --ssh-host number")
                 .withRequiredArg()
                 .ofType(Integer.class)
                 .required();
 
         sshOption =  optionParser
-                .accepts(SSH, "Use ssh commands for benchmark");
+                .accepts("ssh", "Use ssh commands for benchmark");
 
 
         sshHostOption = optionParser
-                .accepts(SSH_HOSTS, "Hosts list for ssh option")
-                .requiredIf(SSH)
+                .accepts("ssh-hosts", "Hosts list for ssh option")
+                .requiredIf(sshOption)
                 .withRequiredArg()
                 .describedAs("user1@host1,user2@host2,...")
                 .ofType(String.class)
@@ -120,7 +114,7 @@ class BenchmarkArgumentParser {
                 .defaultsTo(AvailableScenarios.SimpleQueue);
 
         roundsNoOption = optionParser
-                .acceptsAll(asList("r", ROUNDS), "Number of benchmark rounds to perform")
+                .acceptsAll(asList("r", "rounds"), "Number of benchmark rounds to perform")
                 .withRequiredArg()
                 .ofType(Integer.class)
                 .defaultsTo(3);
@@ -154,9 +148,9 @@ class BenchmarkArgumentParser {
             throw new ArgumentParsingException();
         }
 
-        if(arguments.has(HELP)) {
+        if(arguments.has(helpOption)) {
             optionParser.printHelpOn(System.out);
-            throw new ArgumentParsingException();
+            return;
         }
 
         if (arguments.has("ssh")) {
