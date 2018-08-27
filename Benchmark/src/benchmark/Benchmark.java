@@ -1,63 +1,91 @@
 package benchmark;
 
-import benchmark.config.BasicScenarioParameters;
-import benchmark.config.SshLocalEnvironment;
-import benchmark.core.ScenarioRunner;
+import benchmark.config.LocalEnvironment;
+import benchmark.config.SshEnvironment;
+import benchmark.core.ArgumentParsingException;
 import commands.Command;
 import commands.SshCommand;
 import commands.paxosstm.Parameters;
 import commands.paxosstm.PaxosSTMTestCommand;
-import soa.paxosstm.dstm.internal.TransactionOracle;
 import tests.paxosstm.EnvironmentConf;
-import tools.Tools;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.Collections;
 
 public class Benchmark {
-    static void run(int nodesNo, Class<?> scenarioClass, BasicScenarioParameters[] parameters)
-            throws IOException {
+    private final BenchmarkArgumentParser arguments;
+    private final int nodesNo;
+    private final Class<? extends Scenario> scenarioClass;
 
-        String directoryName = "benchmark-results/" + LocalDateTime.now() + "-" + scenarioClass.getSimpleName();
+    private Benchmark(BenchmarkArgumentParser arguments) throws ArgumentParsingException {
+        this.arguments = arguments;
+        this.nodesNo = arguments.getNodesNo();
+        this.scenarioClass = Scenario.getScenarioClass(arguments.getScenarioType());
+        System.out.println(arguments);
+
+        setupPaxos();
+    }
+
+    public static void main(String[] args) {
+        BenchmarkArgumentParser benchmarkArgs;
+        try {
+            benchmarkArgs = new BenchmarkArgumentParser(args);
+            new Benchmark(benchmarkArgs).run();
+        } catch (ArgumentParsingException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void run() {
+
+        String directoryName = "benchmark-results/" +
+                LocalDateTime.now() +
+                "-" +
+                scenarioClass.getSimpleName() +
+                (arguments.hasOutputName() ? "-" + arguments.getOutputName() : "");
         runners.BenchmarkRunner.createDirectoryIfNotExists(directoryName);
 
-        EnvironmentConf env = setupEnvironment(nodesNo);
         Command[] commands = new Command[nodesNo];
         int[] timeouts = new int[nodesNo];
         String[] outFilenames = new String[nodesNo];
         String[] errFilenames = new String[nodesNo];
 
-        for (int i = 0; i < nodesNo; i++) {
+        EnvironmentConf environment = setupEnvironment();
 
-            String[] encodedParameters = new String[3];
-            encodedParameters[0] = TransactionOracle.DeferredUpdateOracle.class.getSimpleName();
-            encodedParameters[1] = scenarioClass.getName();
-            encodedParameters[2] = Tools.toString(parameters[i]);
+        for (int i = 0; i < nodesNo; i++) {
 
             outFilenames[i] = directoryName + "/out" + i + ".txt";
             errFilenames[i] = directoryName + "/out" + i + "-err.txt";
             PaxosSTMTestCommand paxosstmTestCommand = new PaxosSTMTestCommand(
                     ScenarioRunner.class.getName(),
-                    encodedParameters,
+                    arguments.getArgs(),
                     i,
-                    env.confString,
+                    environment.confString,
                     new String[]{
                             Parameters.WORKSPACE + "/PaxosMessaging/out/production/Benchmark",
                             Parameters.WORKSPACE + "/PaxosMessaging/out/production/Core",
-                            Parameters.WORKSPACE + "/BenchmarkRunner/bin"
+                            Parameters.WORKSPACE + "/BenchmarkRunner/bin",
+                            Parameters.WORKSPACE + "/PaxosMessaging/Benchmark/lib/jopt-simple-5.0.4.jar"
                     },
                     null
             );
+
             Command execCommand = new Command(
                     "cd " + Parameters.getPaxosSTMConfFiles() + "; " + paxosstmTestCommand.toString() + ";"
             );
-            Command bashCommand = new Command("bash", "-c", execCommand.toString());
-            SshCommand sshCommand = new SshCommand(null, env.loginsAtHosts[i],
-                    Arrays.asList("bash -ic \"" + execCommand.toString() + "\""));
 
-            commands[i] = env.loginsAtHosts[i] == null || env.loginsAtHosts[i].equals("localhost") ? bashCommand : sshCommand;
-            timeouts[i] = 60000;
+            if (arguments.isSsh()) {
+                commands[i] = new SshCommand(
+                        null,
+                        environment.loginsAtHosts[i],
+                        Collections.singletonList("bash -ic \"" + execCommand.toString() + "\"")
+                );
+            } else {
+                commands[i] = new Command("bash", "-c", execCommand.toString());
+            }
+
+            timeouts[i] = arguments.getTimeout();
         }
         for (Command cmd : commands) {
             System.out.println(cmd);
@@ -65,25 +93,29 @@ public class Benchmark {
         runners.BenchmarkRunner.runConcurrentCommands(commands, timeouts, outFilenames, errFilenames, 1);
     }
 
-    static void setup() {
-        setup(
-                "/home/wiekonek/Documents/magisterka-local/paxosstm-all",
-                "/home/wiekonek/Documents/magisterka-local/paxosstm-all/PaxosSTM/logback.xml"
-        );
-    }
-
-    static void setup(String paxosWorkspace, String logbackConfigFilePath) {
-        Parameters.WORKSPACE = paxosWorkspace;
-        Parameters.SYSTEM_PROPERTIES = "-Dlogback.configurationFile=file://" + logbackConfigFilePath;
+    private void setupPaxos() {
+        if (arguments.hasWorkspace()) {
+            Parameters.WORKSPACE = arguments.getWorkspace();
+        } else {
+            String workingDir = System.getProperty("user.dir");
+            workingDir = workingDir.substring(0, workingDir.lastIndexOf('/')); // parent
+            System.out.println("Assuming current location as child of paxos workspace: " + workingDir);
+            Parameters.WORKSPACE = workingDir;
+        }
+        Parameters.SYSTEM_PROPERTIES =
+                "-Dlogback.configurationFile=file://" + Parameters.WORKSPACE + "/PaxosSTM/logback.xml";
         Parameters.JVM_SETTINGS = "-Xmx256m -Xms256m -Xmn128m";
     }
 
-    private static EnvironmentConf setupEnvironment(int nodesNo) {
-        EnvironmentConf env = new SshLocalEnvironment("wiekonek", nodesNo);
-        runners.Main.killArray = env.loginsAtHosts;
-        System.out.println("Config:");
-        System.out.println(env.confString);
-        System.out.println();
-        return env;
+
+    private EnvironmentConf setupEnvironment() {
+        EnvironmentConf environment;
+        if (arguments.isSsh()) {
+            environment = new SshEnvironment(arguments.sshHosts());
+            runners.Main.killArray = environment.loginsAtHosts;
+        } else {
+            environment = new LocalEnvironment(nodesNo);
+        }
+        return environment;
     }
 }

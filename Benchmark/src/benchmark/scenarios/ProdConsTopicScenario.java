@@ -1,33 +1,18 @@
 package benchmark.scenarios;
 
-import benchmark.config.BasicScenarioParameters;
-import benchmark.core.Scenario;
+import benchmark.Scenario;
 import benchmark.scenarios.workers.SimpleSubscriber;
 import benchmark.scenarios.workers.SimpleTopicProducer;
 import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import edu.put.paxosstm.messaging.core.MessageTopic;
-import tools.Tools;
-
 public class ProdConsTopicScenario extends Scenario {
-    private BasicScenarioParameters params;
 
-    @Override
-    protected void benchmark(String[] params) throws InterruptedException, MessagingException {
-        this.params = new BasicScenarioParameters();
-        try {
-            this.params = (BasicScenarioParameters) Tools.fromString(params[0], this.params);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        for (int i = 0; i < this.params.roundsNumber; i++) {
-            System.out.println();
-            System.out.println("Round: " + i);
-            round();
-        }
+    public ProdConsTopicScenario(int roundsNo, String[] args) {
+        super(roundsNo, args);
     }
 
-    private void round() throws InterruptedException, MessagingException {
+    protected void round() throws MessagingException {
 
         MessageTopic topic = messagingContext.createTopicWithStatisticsCollection("messages-topic");
         barrier("init-round");
@@ -47,10 +32,15 @@ public class ProdConsTopicScenario extends Scenario {
         for(Thread t : subscribers) t.start();
         for(Thread t : producers) t.start();
 
-        for (Thread t : subscribers) t.join();
-        for (Thread t : producers) t.join();
+        try {
+            for (Thread t : subscribers) t.join();
+            for (Thread t : producers) t.join();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        System.out.printf(topic.getCollectedStatistics().getStatisticsLog());
+        System.out.print(topic.getCollectedStatistics().getStatisticsLog());
         barrier("stop-round");
     }
+
 }

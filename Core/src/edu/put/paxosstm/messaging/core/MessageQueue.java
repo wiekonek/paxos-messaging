@@ -1,5 +1,6 @@
 package edu.put.paxosstm.messaging.core;
 
+import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import edu.put.paxosstm.messaging.consumers.MessageConsumer;
 import edu.put.paxosstm.messaging.core.data.Message;
 import edu.put.paxosstm.messaging.core.queue.MQueue;
@@ -66,6 +67,11 @@ public abstract class MessageQueue extends TransactionStatisticsCollector implem
                     }
                 };
                 if (exit[0]) {
+                    break;
+                }
+                MessageConsumer consumer = consumers.get(currentConsumer);
+                if(consumer == null) {
+                    System.err.println("Null consumer!!");
                     break;
                 }
                 consumers.get(currentConsumer).consumeMessage(msg[0]);
