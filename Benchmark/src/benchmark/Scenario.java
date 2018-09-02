@@ -16,7 +16,9 @@ import java.util.List;
 public abstract class Scenario {
 
     protected final BenchmarkMessagingContext messagingContext;
+    @SuppressWarnings("WeakerAccess")
     protected final PaxosSTM paxos;
+    @SuppressWarnings("WeakerAccess")
     protected final int nodeId;
     protected final String[] args;
 

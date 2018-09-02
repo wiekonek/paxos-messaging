@@ -18,7 +18,7 @@ do
     printf "ConcurrentQueue "
     for ConcurrentQueue in 1 40 80 160 480 960
     do
-        echo "${simpleQueueTest} -- ${prodConsParams} --concurrent-queues=${ConcurrentQueue}"
+        `${simpleQueueTest} -- ${prodConsParams} --concurrent-queues=${ConcurrentQueue}`
         printf "."
     done
 
@@ -27,7 +27,7 @@ do
     do
         for SelectionType in "RoundRobin" "Random"
         do
-            echo "${simpleQueueTest} -- ${prodConsParams} --concurrent-queues=${ConcurrentQueue} --selection-strategy=${SelectionType}"
+            `${simpleQueueTest} -- ${prodConsParams} --concurrent-queues=${ConcurrentQueue} --selection-strategy=${SelectionType}`
             printf "."
         done
     done
@@ -35,6 +35,4 @@ do
     printf "\n"
 done
 
-
-
-#java -jar Benchmark.jar -n8
+echo "Done!!"
