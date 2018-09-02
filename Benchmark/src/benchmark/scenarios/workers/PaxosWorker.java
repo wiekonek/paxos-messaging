@@ -2,21 +2,39 @@ package benchmark.scenarios.workers;
 
 import soa.paxosstm.dstm.PaxosSTM;
 
-public abstract class PaxosWorker implements  Runnable {
+public abstract class PaxosWorker implements Runnable {
 
-    protected final int nodeId;
-    protected final int workerThreadId;
+    private final int nodeId;
+    private final int workerThreadId;
+    private long executionTime;
 
-    public PaxosWorker(int workerThreadId) {
+    PaxosWorker(int workerThreadId) {
         this.nodeId = PaxosSTM.getInstance().getId();
         this.workerThreadId = workerThreadId;
     }
 
-    protected String getId() {
-        return String.format("[%1$02d, %2$02d]", nodeId, workerThreadId);
+    @Override
+    public void run() {
+        long startTime = System.currentTimeMillis();
+        measuredRun();
+        executionTime = System.currentTimeMillis() - startTime;
     }
 
-    protected void log(String str) {
+    public String getFullName() {
+        return String.format("[%04d %04d] <%s>", nodeId, workerThreadId, getClass().getSimpleName());
+    }
+
+    public long getExecutionTime() {
+        return executionTime;
+    }
+
+    void log(String str) {
         System.out.println(String.format("%s: %s", getId(), str));
+    }
+
+    protected abstract void measuredRun();
+
+    String getId() {
+        return String.format("[%04d, %04d]", nodeId, workerThreadId);
     }
 }

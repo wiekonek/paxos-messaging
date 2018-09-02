@@ -2,6 +2,7 @@ package benchmark;
 
 import benchmark.core.ArgumentParsingException;
 import benchmark.core.AvailableScenarios;
+import benchmark.core.LogType;
 import joptsimple.*;
 
 import java.io.IOException;
@@ -25,6 +26,7 @@ class BenchmarkArgumentParser {
     private final ArgumentAcceptingOptionSpec<Integer> timeoutOption;
     private final ArgumentAcceptingOptionSpec<String> outputFolderOption;
     private final ArgumentAcceptingOptionSpec<String> workspaceOption;
+    private final ArgumentAcceptingOptionSpec<LogType> logTypeOption;
 
     int getNodesNo() {
         return arguments.valueOf(nodesNoOption);
@@ -56,6 +58,10 @@ class BenchmarkArgumentParser {
 
     String getWorkspace() {
         return arguments.valueOf(workspaceOption);
+    }
+
+    LogType getLogType() {
+        return arguments.valueOf(logTypeOption);
     }
 
     String[] getScenarioArgs() {
@@ -126,7 +132,7 @@ class BenchmarkArgumentParser {
                 .defaultsTo(60000);
 
         outputFolderOption = optionParser
-                .acceptsAll(asList("o", "output"), "Additional suffix of output folder")
+                .acceptsAll(asList("o", "outputFolder"), "Additional suffix of output folder")
                 .withRequiredArg()
                 .ofType(String.class);
 
@@ -137,6 +143,15 @@ class BenchmarkArgumentParser {
                 )
                 .withRequiredArg()
                 .ofType(String.class);
+
+        logTypeOption = optionParser
+                .acceptsAll(
+                        asList("l", "logType"),
+                        "Type of logging"
+                )
+                .withRequiredArg()
+                .ofType(LogType.class)
+                .defaultsTo(LogType.Verbose);
 
 
         try {

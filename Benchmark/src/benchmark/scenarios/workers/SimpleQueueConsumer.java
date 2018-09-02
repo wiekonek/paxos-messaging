@@ -6,7 +6,7 @@ import edu.put.paxosstm.messaging.consumers.MessageLogger;
 import java.io.Serializable;
 
 
-public class SimpleQueueConsumer extends PaxosWorker implements Serializable {
+public class SimpleQueueConsumer extends PaxosWorker {
     private final MQueue queue;
 
     public SimpleQueueConsumer(MQueue queue, int workerThreadId) {
@@ -15,7 +15,7 @@ public class SimpleQueueConsumer extends PaxosWorker implements Serializable {
     }
 
     @Override
-    public void run() {
+    public void measuredRun() {
         queue.registerConsumer((msg) -> {});
     }
 }

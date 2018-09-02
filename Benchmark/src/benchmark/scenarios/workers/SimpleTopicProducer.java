@@ -18,7 +18,7 @@ public class SimpleTopicProducer extends PaxosWorker {
     }
 
     @Override
-    public void run() {
+    public void measuredRun() {
         for (int i = 0; i < productsCount; i++) {
             Message msg = new Message(getId() + ": " + i);
             topic.publish(msg);

@@ -37,10 +37,10 @@ public class MessagingContext extends TransactionStatisticsCollector {
         MessageQueue queue;
         switch (params.getType()) {
             case Simple:
-                queue = new SingleMessageQueue(id);
+                queue = new SingleMessageQueue(id, params.getSelectionStrategy());
                 break;
             case Multi:
-                queue = new MultiMessageQueue(id, params.getConcurrentQueueNumber());
+                queue = new MultiMessageQueue(id, params.getConcurrentQueueNumber(), params.getSelectionStrategy());
                 break;
             default:
                 throw new MessagingException("Unidentified queue type");

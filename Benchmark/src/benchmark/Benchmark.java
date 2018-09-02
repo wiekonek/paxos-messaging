@@ -22,8 +22,7 @@ public class Benchmark {
         this.arguments = arguments;
         this.nodesNo = arguments.getNodesNo();
         this.scenarioClass = Scenario.getScenarioClass(arguments.getScenarioType());
-        System.out.println(arguments);
-
+        System.out.printf("Running with: [%s]\n", arguments);
         setupPaxos();
     }
 
@@ -45,6 +44,7 @@ public class Benchmark {
                 scenarioClass.getSimpleName() +
                 (arguments.hasOutputName() ? "-" + arguments.getOutputName() : "");
         runners.BenchmarkRunner.createDirectoryIfNotExists(directoryName);
+        System.out.printf("Output directory: %s\n", System.getProperty("user.dir") + directoryName);
 
         Command[] commands = new Command[nodesNo];
         int[] timeouts = new int[nodesNo];
@@ -87,10 +87,9 @@ public class Benchmark {
 
             timeouts[i] = arguments.getTimeout();
         }
-        for (Command cmd : commands) {
-            System.out.println(cmd);
-        }
+        System.out.println("Start benchmarking");
         runners.BenchmarkRunner.runConcurrentCommands(commands, timeouts, outFilenames, errFilenames, 1);
+        System.out.println("Finished");
     }
 
     private void setupPaxos() {

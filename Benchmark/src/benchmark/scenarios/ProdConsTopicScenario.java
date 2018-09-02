@@ -1,46 +1,48 @@
 package benchmark.scenarios;
 
+import benchmark.RoundStatistics;
 import benchmark.Scenario;
-import benchmark.scenarios.workers.SimpleSubscriber;
-import benchmark.scenarios.workers.SimpleTopicProducer;
+import benchmark.scenarios.workers.*;
 import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import edu.put.paxosstm.messaging.core.MessageTopic;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+
 public class ProdConsTopicScenario extends Scenario {
+    private final ProdConsParser argsParser;
 
 
     public ProdConsTopicScenario(int roundsNo, String[] args) {
         super(roundsNo, args);
+        argsParser = new ProdConsParser(args);
+        System.out.printf("Scenario arguments: [%s]\n", argsParser);
     }
 
-    protected void round() throws MessagingException {
-
+    protected RoundStatistics round() throws MessagingException {
         MessageTopic topic = messagingContext.createTopicWithStatisticsCollection("messages-topic");
+        ArrayList<Thread> threads = new ArrayList<>();
+        ArrayList<PaxosWorker> workers = new ArrayList<>();
         barrier("init-round");
 
-        int producersNo = 2;
-        Thread[] producers = new Thread[producersNo];
+        int producersNo = argsParser.getProducersNo();
         for (int i = 0; i < producersNo; i++) {
-            producers[i] = new Thread(new SimpleTopicProducer(messagingContext, topic, i, 2));
+            PaxosWorker worker = new SimpleTopicProducer(messagingContext, topic, i, argsParser.getProductsNo());
+            workers.add(worker);
+            threads.add(new Thread(worker));
         }
-
-        int consumersNo = 2;
-        Thread[] subscribers = new Thread[consumersNo];
+        int consumersNo = argsParser.getConsumersNo();
         for (int i = 0; i < consumersNo; i++) {
-            subscribers[i] = new Thread(new SimpleSubscriber(topic, i));
+            PaxosWorker worker = new SimpleSubscriber(topic, i);
+            workers.add(worker);
+            threads.add(new Thread(worker));
         }
 
-        for(Thread t : subscribers) t.start();
-        for(Thread t : producers) t.start();
+        long executionTime = threadsRunner(threads);
+        LinkedHashMap<String, Long> threadExecutionTimes = collectWorkersExecutionTimes(workers);
 
-        try {
-            for (Thread t : subscribers) t.join();
-            for (Thread t : producers) t.join();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        System.out.print(topic.getCollectedStatistics().getStatisticsLog());
         barrier("stop-round");
+        return new RoundStatistics(topic.getCollectedStatistics(), executionTime, threadExecutionTimes);
     }
 
 }

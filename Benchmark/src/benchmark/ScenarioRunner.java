@@ -1,6 +1,7 @@
 package benchmark;
 
 import benchmark.core.ArgumentParsingException;
+import benchmark.core.Logger;
 import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import edu.put.paxosstm.messaging.core.utils.OracleInitializer;
 import soa.paxosstm.common.StorageException;
@@ -19,6 +20,7 @@ public class ScenarioRunner {
             e.printStackTrace();
             return;
         }
+        Logger.logType = benchmarkArgs.getLogType();
 
         PaxosSTM paxos = PaxosSTM.getInstance();
         try {
@@ -29,9 +31,7 @@ public class ScenarioRunner {
             return;
         }
 
-        paxos.enterBarrier("start-scenario", PaxosSTM.getInstance().getNumberOfNodes());
         OracleInitializer.initDefferedOracle();
-
 
         Scenario scenario = null;
         try {

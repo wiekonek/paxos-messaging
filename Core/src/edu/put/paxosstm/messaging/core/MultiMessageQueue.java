@@ -1,6 +1,7 @@
 package edu.put.paxosstm.messaging.core;
 
 import edu.put.paxosstm.messaging.core.data.Message;
+import edu.put.paxosstm.messaging.core.queue.ConsumerSelectionStrategy;
 import edu.put.paxosstm.messaging.core.transactional.TBidirectionalMessageList;
 import soa.paxosstm.dstm.PaxosSTM;
 import soa.paxosstm.dstm.Transaction;
@@ -11,8 +12,8 @@ class MultiMessageQueue extends MessageQueue {
     private final int queueNo;
     private int currentQueue;
 
-    MultiMessageQueue(String id, int concurrentQueueNumber) {
-        super(concurrentQueueNumber * 3);
+    MultiMessageQueue(String id, int concurrentQueueNumber, ConsumerSelectionStrategy strategy) {
+        super(concurrentQueueNumber * 3, strategy);
         queueNo = concurrentQueueNumber;
         currentQueue = 0;
         String[] ids = new String[concurrentQueueNumber];

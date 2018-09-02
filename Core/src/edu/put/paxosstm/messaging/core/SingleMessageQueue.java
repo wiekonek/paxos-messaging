@@ -1,5 +1,6 @@
 package edu.put.paxosstm.messaging.core;
 
+import edu.put.paxosstm.messaging.core.queue.ConsumerSelectionStrategy;
 import edu.put.paxosstm.messaging.core.transactional.TBidirectionalMessageList;
 import edu.put.paxosstm.messaging.core.data.Message;
 import soa.paxosstm.dstm.PaxosSTM;
@@ -10,8 +11,8 @@ class SingleMessageQueue extends MessageQueue {
 
 
 
-    SingleMessageQueue(String id) {
-        super();
+    SingleMessageQueue(String id, ConsumerSelectionStrategy strategy) {
+        super(3, strategy);
         new Transaction() {
             @Override
             public void atomic() {

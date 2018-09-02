@@ -3,28 +3,30 @@ package edu.put.paxosstm.messaging.core;
 import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import edu.put.paxosstm.messaging.consumers.MessageConsumer;
 import edu.put.paxosstm.messaging.core.data.Message;
+import edu.put.paxosstm.messaging.core.queue.ConsumerSelectionStrategy;
 import edu.put.paxosstm.messaging.core.queue.MQueue;
 import edu.put.paxosstm.messaging.core.utils.TransactionStatisticsCollector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public abstract class MessageQueue extends TransactionStatisticsCollector implements MQueue {
 
     private final List<MessageConsumer> consumers;
+    private final Random rnd;
     private int consumerNo;
     private int currentConsumer;
     private final int maxRetryNumber;
+    private final ConsumerSelectionStrategy consumerSelectionStrategy;
 
-    MessageQueue() {
-        this(3);
-    }
-
-    MessageQueue(int maxRetryNumber) {
+    MessageQueue(int maxRetryNumber, ConsumerSelectionStrategy consumerSelectionStrategy) {
         this.maxRetryNumber = maxRetryNumber;
+        this.consumerSelectionStrategy = consumerSelectionStrategy;
         consumers = new ArrayList<>();
         currentConsumer = 0;
         consumerNo = 0;
+        rnd = new Random();
     }
 
     @Override
@@ -75,7 +77,13 @@ public abstract class MessageQueue extends TransactionStatisticsCollector implem
                     break;
                 }
                 consumers.get(currentConsumer).consumeMessage(msg[0]);
-                currentConsumer = (currentConsumer + 1) % consumerNo;
+                switch (consumerSelectionStrategy) {
+                    case RoundRobin:
+                        currentConsumer = (currentConsumer + 1) % consumerNo;
+                        break;
+                    case Random:
+                        currentConsumer = rnd.nextInt(consumerNo);
+                }
             }
         });
         thread.start();

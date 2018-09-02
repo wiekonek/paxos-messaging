@@ -1,7 +1,10 @@
 package edu.put.paxosstm.messaging.core;
 
+import edu.put.paxosstm.messaging.core.queue.ConsumerSelectionStrategy;
 import edu.put.paxosstm.messaging.core.queue.MQueue;
 import edu.put.paxosstm.messaging.core.queue.MQueueType;
+
+import java.util.function.Consumer;
 
 public class MQueueParams {
 
@@ -15,12 +18,30 @@ public class MQueueParams {
      */
     private int concurrentQueueNumber = 4;
 
+    /**
+     * Strategy for message queue when selecting next consumer
+     */
+    private ConsumerSelectionStrategy selectionStrategy = ConsumerSelectionStrategy.RoundRobin;
+
+    /**
+     * @return  See {@link #type}
+     */
     MQueueType getType() {
         return type;
     }
 
+    /**
+     * @return  See {@link #concurrentQueueNumber}
+     */
     int getConcurrentQueueNumber() {
         return concurrentQueueNumber;
+    }
+
+    /**
+     * @return  See {@link #selectionStrategy}
+     */
+    ConsumerSelectionStrategy getSelectionStrategy() {
+        return selectionStrategy;
     }
 
     /**
@@ -29,7 +50,6 @@ public class MQueueParams {
      * Create {@link MQueueType#Simple} MQueue.
      */
     public MQueueParams() {
-
     }
 
     public MQueueParams(MQueueType type) {
@@ -37,7 +57,14 @@ public class MQueueParams {
     }
 
     public MQueueParams(MQueueType type, int concurrentQueueNumber) {
-        this.type = type;
+       this(type);
         this.concurrentQueueNumber = concurrentQueueNumber;
     }
+
+    public MQueueParams(MQueueType type, int concurrentQueueNumber, ConsumerSelectionStrategy strategy) {
+        this(type, concurrentQueueNumber);
+        this.selectionStrategy = strategy;
+    }
+
+
 }
