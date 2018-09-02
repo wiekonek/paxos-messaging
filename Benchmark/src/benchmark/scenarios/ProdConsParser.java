@@ -7,8 +7,8 @@ import joptsimple.OptionSet;
 import static java.util.Arrays.asList;
 
 public class ProdConsParser {
-    protected final OptionParser optionParser;
-    protected final OptionSet arguments;
+    final OptionParser optionParser;
+    final OptionSet arguments;
 
     private ArgumentAcceptingOptionSpec<Integer> producersNoOption;
     private ArgumentAcceptingOptionSpec<Integer> productsNoOption;

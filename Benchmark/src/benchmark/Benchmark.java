@@ -30,6 +30,9 @@ public class Benchmark {
         BenchmarkArgumentParser benchmarkArgs;
         try {
             benchmarkArgs = new BenchmarkArgumentParser(args);
+            if(benchmarkArgs.hasHelp()) {
+                return;
+            }
             new Benchmark(benchmarkArgs).run();
         } catch (ArgumentParsingException | IOException e) {
             e.printStackTrace();

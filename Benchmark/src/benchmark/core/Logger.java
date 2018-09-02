@@ -4,23 +4,18 @@ public class Logger {
 
     public static LogType logType = LogType.Verbose;
 
-    public static void logCsv(String log) {
-        if (logType == LogType.Csv  || logType == LogType.All) {
+    public static void log(LogType type, String log) {
+        if (type == LogType.All || type == logType || logType == LogType.All ||
+                (type == LogType.CsvMinimal && logType == LogType.Csv) ) {
             System.out.print(log);
         }
     }
 
-    public static void logCsv(String logFormat, Object... args) {
-        logCsv(String.format(logFormat, args));
+    public static void log(LogType type, String logFormat, Object... args) {
+        log(type, String.format(logFormat, args));
     }
 
-    public static void log(String log) {
-        if (logType == LogType.Verbose  || logType == LogType.All) {
-            System.out.print(log);
-        }
-    }
-
-    public static void log(String logFormat, Object... args) {
-        log(String.format(logFormat, args));
+    public static void logln(LogType type, String log) {
+        log(type, "%s\n", log);
     }
 }

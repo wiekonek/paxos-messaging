@@ -1,6 +1,7 @@
 package benchmark;
 
 import benchmark.core.ArgumentParsingException;
+import benchmark.core.LogType;
 import benchmark.core.Logger;
 import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import edu.put.paxosstm.messaging.core.utils.OracleInitializer;
@@ -21,6 +22,7 @@ public class ScenarioRunner {
             return;
         }
         Logger.logType = benchmarkArgs.getLogType();
+        Logger.log(LogType.All, "[%s]\n", benchmarkArgs);
 
         PaxosSTM paxos = PaxosSTM.getInstance();
         try {

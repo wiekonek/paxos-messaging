@@ -20,7 +20,6 @@ public class ProdConsScenario extends Scenario {
     public ProdConsScenario(int roundsNo, String[] args) {
         super(roundsNo, args);
         argsParser = new ProdConsQueueParser(args);
-        System.out.printf("Scenario arguments: [%s]\n", argsParser);
     }
 
     protected RoundStatistics round() throws MessagingException {

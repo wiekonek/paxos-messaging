@@ -28,6 +28,10 @@ class BenchmarkArgumentParser {
     private final ArgumentAcceptingOptionSpec<String> workspaceOption;
     private final ArgumentAcceptingOptionSpec<LogType> logTypeOption;
 
+    boolean hasHelp() {
+        return  arguments.has(helpOption);
+    }
+
     int getNodesNo() {
         return arguments.valueOf(nodesNoOption);
     }
@@ -163,7 +167,7 @@ class BenchmarkArgumentParser {
             throw new ArgumentParsingException();
         }
 
-        if(arguments.has(helpOption)) {
+        if(hasHelp()) {
             optionParser.printHelpOn(System.out);
             return;
         }

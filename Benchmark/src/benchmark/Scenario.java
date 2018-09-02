@@ -102,11 +102,11 @@ public abstract class Scenario {
         RoundStatistics nodeStatistics = new RoundStatistics();
         for(int i = 0; i < roundsNo; i++) {
             barrier(String.format("start-round-%d", i));
-            Logger.log("########################## Start round %03d ##########################\n", i);
+            Logger.log(LogType.Verbose, "########################## Start round %03d ##########################\n", i);
 
             RoundStatistics roundStatistics = round();
 
-            logStats("Round summary", roundStatistics);
+            logStats("Round summary", roundStatistics, LogType.Csv);
 
             new Transaction() {
                 @Override
@@ -124,15 +124,15 @@ public abstract class Scenario {
                     }
                 };
                 allRound.threadExecutionTimes.clear();
-                logStats("Round summary for all nodes", allRound);
+                logStats("Round summary for all nodes", allRound, LogType.CsvMinimal);
             }
 
             makeSnapshot();
             nodeStatistics = nodeStatistics.add(roundStatistics);
         }
 
-        Logger.log("########################## Global summary ##########################");
-        logStats("Node summary", nodeStatistics);
+        Logger.log(LogType.Verbose, "########################## Global summary ##########################");
+        logStats("Node summary", nodeStatistics, LogType.Csv);
 
         RoundStatistics finalNodeStatistics = nodeStatistics;
         new Transaction() {
@@ -146,16 +146,14 @@ public abstract class Scenario {
 
         RoundStatistics roundStatistics = getValueOfTObject(statistics::get);
         roundStatistics.threadExecutionTimes.clear();
-        Logger.log("Alle nodes summary");
-        Logger.log("%s\n", roundStatistics.statistics.getStatisticsLog());
-        Logger.logCsv("[%s],%s\n\n", String.join(" ", args), roundStatistics.getCsv());
+        logStats("All nodes summary", roundStatistics, LogType.CsvMinimal);
     }
 
-    private void logStats(String title, RoundStatistics stats) {
-        Logger.log("%s\n", title);
-        Logger.log("Total round execution time: %d ms\n", stats.executionTime);
-        Logger.log("%s\n", stats.statistics.getStatisticsLog());
-        Logger.logCsv("%s\n\n", stats.getCsv());
+    private void logStats(String title, RoundStatistics stats, LogType csvType) {
+        Logger.log(LogType.Verbose, "%s\n", title);
+        Logger.log(LogType.Verbose, "Total round execution time: %d ms\n", stats.executionTime);
+        Logger.log(LogType.Verbose, "%s\n", stats.statistics.getStatisticsLog());
+        Logger.log(csvType, "%s\n", stats.getCsv());
     }
 
     private static void initCommitListener() {
@@ -185,16 +183,16 @@ public abstract class Scenario {
     }
 
     interface TGetter<T> {
-        T select();
+        T get();
     }
 
-    private <T> T getValueOfTObject(TGetter<T> selector) {
+    private <T> T getValueOfTObject(TGetter<T> getter) {
         //noinspection unchecked
         final T[] TObj = (T[])new Object[1];
         new Transaction(true) {
             @Override
             public void atomic() {
-                TObj[0] = selector.select();
+                TObj[0] = getter.get();
             }
         };
 

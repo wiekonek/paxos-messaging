@@ -16,7 +16,6 @@ public class ProdConsTopicScenario extends Scenario {
     public ProdConsTopicScenario(int roundsNo, String[] args) {
         super(roundsNo, args);
         argsParser = new ProdConsParser(args);
-        System.out.printf("Scenario arguments: [%s]\n", argsParser);
     }
 
     protected RoundStatistics round() throws MessagingException {
