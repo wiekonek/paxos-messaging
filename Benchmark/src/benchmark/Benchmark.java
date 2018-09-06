@@ -47,7 +47,7 @@ public class Benchmark {
                 scenarioClass.getSimpleName() +
                 (arguments.hasOutputName() ? "-" + arguments.getOutputName() : "");
         runners.BenchmarkRunner.createDirectoryIfNotExists(directoryName);
-        System.out.printf("Output directory: %s\n", System.getProperty("user.dir") + directoryName);
+        System.out.printf("Output directory: %s\n", System.getProperty("user.dir") + "\\"+ directoryName);
 
         Command[] commands = new Command[nodesNo];
         int[] timeouts = new int[nodesNo];

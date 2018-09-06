@@ -1,34 +1,34 @@
 #!/usr/bin/env bash
 hosts=""
-for HostNo in {01..17}
+for HostNo in {01..08}
 do
-    hosts+="10.10.1$HostNo,"
+    hosts+="10.10.0.1$HostNo,"
 done
 hosts=${hosts::-1}
-echo $hosts
 
 sshParam="--ssh --ssh-hosts=${hosts}"
 benchmark="java -jar Benchmark.jar -r20 -l CsvMinimal"
-prodConsParams="--producers=10 --producer-products=10000 --consumers=50"
+prodConsParams="--producers=5 --producer-products=1000 --consumers=25"
 
-for NodesNo in 8 16
+
+for NodesNo in 8
 do
-    simpleQueueTest="${benchmark} -n${NodesNo} ${sshParam} -s SimpleQueue -t 180000"
+    simpleQueueTest="${benchmark} -n${NodesNo} ${sshParam} -s SimpleQueue -t 1800000"
     printf "NodesNo = ${NodesNo}\n"
-    printf "ConcurrentQueue "
-    for ConcurrentQueue in 1 40 80 160 480 960
+    printf "ConcurrentQueue\n"
+    for ConcurrentQueue in 1 10 20 40 80 160 200
     do
-        `${simpleQueueTest} -- ${prodConsParams} --concurrent-queues=${ConcurrentQueue}`
-        printf "."
+        ${simpleQueueTest} -o "concurrent_queue_${ConcurrentQueue}" -- ${prodConsParams} --concurrent-queues=${ConcurrentQueue}
+        printf "\n\n"
     done
 
-    printf "\nConsumerSelectionType "
-    for ConcurrentQueue in 1 160 480
+    printf "ConsumerSelectionType\n"
+    for ConcurrentQueue in 20 80 160 200
     do
         for SelectionType in "RoundRobin" "Random"
         do
-            `${simpleQueueTest} -- ${prodConsParams} --concurrent-queues=${ConcurrentQueue} --selection-strategy=${SelectionType}`
-            printf "."
+            ${simpleQueueTest} -o "${ConcurrentQueue}_selection_type_${SelectionType}" -- ${prodConsParams} --concurrent-queues=${ConcurrentQueue} --selection-strategy=${SelectionType}
+            printf "\n\n"
         done
     done
 

@@ -31,8 +31,10 @@ public abstract class MessageQueue extends TransactionStatisticsCollector implem
 
     @Override
     public final void registerConsumer(MessageConsumer messageConsumer) {
-        consumers.add(messageConsumer);
-        consumerNo++;
+        synchronized (this) {
+            consumers.add(messageConsumer);
+            consumerNo++;
+        }
         if (consumerNo == 1) startConsuming(100);
     }
 
@@ -71,12 +73,15 @@ public abstract class MessageQueue extends TransactionStatisticsCollector implem
                 if (exit[0]) {
                     break;
                 }
-                MessageConsumer consumer = consumers.get(currentConsumer);
-                if(consumer == null) {
-                    System.err.println("Null consumer!!");
-                    break;
+                if(consumers.size() > currentConsumer) {
+                    MessageConsumer consumer;
+                    synchronized (consumers) {
+                        consumer = consumers.get(currentConsumer);
+                    }
+                    if (consumer != null) {
+                        consumer.consumeMessage(msg[0]);
+                    }
                 }
-                consumers.get(currentConsumer).consumeMessage(msg[0]);
                 switch (consumerSelectionStrategy) {
                     case RoundRobin:
                         currentConsumer = (currentConsumer + 1) % consumerNo;
