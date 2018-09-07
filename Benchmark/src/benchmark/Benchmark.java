@@ -91,6 +91,9 @@ public class Benchmark {
             timeouts[i] = arguments.getTimeout();
         }
         System.out.println("Start benchmarking");
+        for (Command cmd: commands) {
+            System.out.println(cmd.toString());
+        }
         runners.BenchmarkRunner.runConcurrentCommands(commands, timeouts, outFilenames, errFilenames, 1);
         System.out.println("Finished");
     }

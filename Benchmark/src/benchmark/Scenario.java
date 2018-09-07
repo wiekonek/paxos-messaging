@@ -46,9 +46,15 @@ public abstract class Scenario {
             new Transaction() {
                 @Override
                 public void atomic() {
+                    System.out.println("a");
+                    System.err.println("a");
                     if (paxos.getFromSharedObjectRegistry(statisticsId) == null) {
+                        System.out.println("b");
+                        System.err.println("b");
                         TStatistics s = new TStatistics();
                         paxos.addToSharedObjectRegistry(statisticsId, s);
+                        System.out.println("c");
+                        System.err.println("c");
                     }
                 }
             };

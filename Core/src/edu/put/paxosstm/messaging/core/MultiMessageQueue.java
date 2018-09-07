@@ -20,7 +20,7 @@ class MultiMessageQueue extends MessageQueue {
     private final QueueSelectionStrategy queueSelectionStrategy;
 
     MultiMessageQueue(String id, int concurrentQueueNumber, QueueSelectionStrategy strategy) {
-        super(concurrentQueueNumber * 4);
+        super(10);
         queueSelectionStrategy = strategy;
         rnd = new Random();
         queueNo = concurrentQueueNumber;
