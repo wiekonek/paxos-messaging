@@ -3,7 +3,7 @@ package benchmark.scenarios;
 import benchmark.RoundStatistics;
 import benchmark.Scenario;
 import benchmark.scenarios.workers.PaxosWorker;
-import benchmark.scenarios.workers.SimpleQueueConsumer;
+import benchmark.scenarios.workers.EmptyQueueConsumer;
 import benchmark.scenarios.workers.SimpleQueueProducer;
 import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import edu.put.paxosstm.messaging.core.MQueueParams;
@@ -22,7 +22,7 @@ public class ProdConsScenario extends Scenario {
         argsParser = new ProdConsQueueParser(args);
     }
 
-    protected RoundStatistics round() throws MessagingException {
+    protected RoundStatistics round(int round) throws MessagingException {
 
         MessageQueue queue = messagingContext.createQueueWithStatisticsCollection(
                 "messages-queue",
@@ -30,25 +30,27 @@ public class ProdConsScenario extends Scenario {
         );
         ArrayList<Thread> threads = new ArrayList<>();
         ArrayList<PaxosWorker> workers = new ArrayList<>();
-        barrier("init-round");
+        barrier(String.format("init-round-%d", round));
 
-        int producersNo = argsParser.getProducersNo();
-        for (int i = 0; i < producersNo; i++) {
-            PaxosWorker worker = new SimpleQueueProducer(messagingContext, queue, i, argsParser.getProductsNo());
-            workers.add(worker);
-            threads.add(new Thread(worker));
+        if(nodeId % 2 == 0) {
+            int producersNo = argsParser.getProducersNo();
+            for (int i = 0; i < producersNo; i++) {
+                PaxosWorker worker = new SimpleQueueProducer(messagingContext, queue, i, argsParser.getProductsNo());
+                workers.add(worker);
+                threads.add(new Thread(worker));
+            }
+        } else {
+            int consumersNo = argsParser.getConsumersNo();
+            for (int i = 0; i < consumersNo; i++) {
+                PaxosWorker worker = new EmptyQueueConsumer(queue, i);
+                workers.add(worker);
+                threads.add(new Thread(worker));
+            }
         }
-        int consumersNo = argsParser.getConsumersNo();
-        for (int i = 0; i < consumersNo; i++) {
-            PaxosWorker worker = new SimpleQueueConsumer(queue, i);
-            workers.add(worker);
-            threads.add(new Thread(worker));
-        }
-
         long executionTime = threadsRunner(threads);
+
         LinkedHashMap<String, Long> threadExecutionTimes = collectWorkersExecutionTimes(workers);
 
-        barrier("stop-round");
         return new RoundStatistics(queue.getCollectedStatistics(), executionTime, threadExecutionTimes);
     }
 }

@@ -1,19 +1,28 @@
 package edu.put.paxosstm.messaging.core;
 
 import edu.put.paxosstm.messaging.core.data.Message;
-import edu.put.paxosstm.messaging.core.queue.ConsumerSelectionStrategy;
+import edu.put.paxosstm.messaging.core.queue.QueueSelectionStrategy;
 import edu.put.paxosstm.messaging.core.transactional.TBidirectionalMessageList;
+import soa.paxosstm.dstm.DualModeTransaction;
 import soa.paxosstm.dstm.PaxosSTM;
 import soa.paxosstm.dstm.Transaction;
+
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.util.Random;
 
 class MultiMessageQueue extends MessageQueue {
     private final TBidirectionalMessageList[] tMessageLists;
 
     private final int queueNo;
     private int currentQueue;
+    private final Random rnd;
+    private final QueueSelectionStrategy queueSelectionStrategy;
 
-    MultiMessageQueue(String id, int concurrentQueueNumber, ConsumerSelectionStrategy strategy) {
-        super(concurrentQueueNumber * 3, strategy);
+    MultiMessageQueue(String id, int concurrentQueueNumber, QueueSelectionStrategy strategy) {
+        super(concurrentQueueNumber * 4);
+        queueSelectionStrategy = strategy;
+        rnd = new Random();
         queueNo = concurrentQueueNumber;
         currentQueue = 0;
         String[] ids = new String[concurrentQueueNumber];
@@ -40,13 +49,14 @@ class MultiMessageQueue extends MessageQueue {
 
     @Override
     public void sendMessage(Message msg) {
+
         new CoreTransaction() {
             @Override
             public void atomic() {
                 tMessageLists[currentQueue].Enqueue(msg);
             }
         };
-        currentQueue = nextQueueNo();
+        currentQueue = nextQueueNo(currentQueue);
     }
 
     // TODO: introduce timeout / max retry number
@@ -57,7 +67,7 @@ class MultiMessageQueue extends MessageQueue {
             @Override
             public void atomic() {
                 msg[0] = tMessageLists[currentQueue].Dequeue();
-                currentQueue = nextQueueNo();
+                currentQueue = nextQueueNo(currentQueue);
                 if(msg[0] == null) {
                     retry();
                 }
@@ -69,12 +79,40 @@ class MultiMessageQueue extends MessageQueue {
 
     @Override
     protected Message getNextMessage() {
-        Message msg = tMessageLists[currentQueue].Dequeue();
-        currentQueue = nextQueueNo();
-        return msg;
+
+        final Message[] msg = new Message[1];
+        msg[0] = tMessageLists[currentQueue].Dequeue();
+        currentQueue = nextQueueNo(currentQueue);
+//
+//        new CoreTransaction() {
+//            int r = 0;
+//
+//            @Override
+//            public void atomic() {
+//                msg[0] = tMessageLists[currentQueue].Dequeue();
+//                currentQueue = nextQueueNo(currentQueue);
+//                if(msg[0] == null) {
+//                    if(r < queueNo) {
+//                        r++;
+//                        retry();
+//                    } else {
+//                        rollback();
+//                    }
+//                }
+//            }
+//        };
+        return msg[0];
     }
 
-    private int nextQueueNo() {
-        return (currentQueue + 1) % queueNo;
+
+
+    private int nextQueueNo(int no) {
+        switch (queueSelectionStrategy) {
+            case RoundRobin:
+                return (no + 1) % queueNo;
+            case Random:
+                return rnd.nextInt(queueNo);
+        }
+        return 0;
     }
 }

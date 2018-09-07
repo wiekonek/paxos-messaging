@@ -16,7 +16,7 @@ public class App extends MessagingApp {
             MQueue queue = messagingContext.createQueue("test-queue", new MQueueParams(MQueueType.Simple, 10));
 
             Thread[] threads = new Thread[3];
-            threads[0] = new Thread(() -> queue.registerConsumer(new MessageLogger(String.format("[%d]", nodeId))));
+            threads[0] = new Thread(() -> queue.runConsumer(new MessageLogger(String.format("[%d]", nodeId))));
             threads[1] = new Thread(() -> {
                 for (int i = 0; i < 50; i++) {
                     queue.sendMessage(new Message(String.format("<<{%d} {%d}>>", nodeId, i)));
@@ -33,8 +33,6 @@ public class App extends MessagingApp {
                     thread.join();
                 }
             }
-
-            Thread.sleep(1000);
         } catch (MessagingException | InterruptedException e) {
             e.printStackTrace();
         }

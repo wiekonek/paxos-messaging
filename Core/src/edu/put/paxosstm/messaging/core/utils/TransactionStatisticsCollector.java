@@ -28,7 +28,7 @@ public class TransactionStatisticsCollector implements MStatistics {
     private final Statistics collectedStatistics = new Statistics();
 
     @Override
-    public Statistics getCollectedStatistics() {
+    public synchronized Statistics getCollectedStatistics() {
         return collectedStatistics;
     }
 

@@ -1,6 +1,6 @@
 package benchmark.scenarios;
 
-import edu.put.paxosstm.messaging.core.queue.ConsumerSelectionStrategy;
+import edu.put.paxosstm.messaging.core.queue.QueueSelectionStrategy;
 import joptsimple.ArgumentAcceptingOptionSpec;
 
 import static java.util.Arrays.asList;
@@ -8,7 +8,7 @@ import static java.util.Arrays.asList;
 public class ProdConsQueueParser extends ProdConsParser {
 
     private ArgumentAcceptingOptionSpec<Integer> concurrentQueuesOption;
-    private ArgumentAcceptingOptionSpec<ConsumerSelectionStrategy> selectionStrategyOption;
+    private ArgumentAcceptingOptionSpec<QueueSelectionStrategy> selectionStrategyOption;
 
     ProdConsQueueParser(String[] args) {
         super(args);
@@ -27,15 +27,15 @@ public class ProdConsQueueParser extends ProdConsParser {
         selectionStrategyOption = optionParser
                 .acceptsAll(asList("ss", "selection-strategy"), "Consumer selection strategy")
                 .withRequiredArg()
-                .ofType(ConsumerSelectionStrategy.class)
-                .defaultsTo(ConsumerSelectionStrategy.RoundRobin);
+                .ofType(QueueSelectionStrategy.class)
+                .defaultsTo(QueueSelectionStrategy.RoundRobin);
     }
 
     int getConcurrentQueueNo() {
         return arguments.valueOf(concurrentQueuesOption);
     }
 
-    ConsumerSelectionStrategy getSelectionStrategy() {
+    QueueSelectionStrategy getSelectionStrategy() {
         return arguments.valueOf(selectionStrategyOption);
     }
 }

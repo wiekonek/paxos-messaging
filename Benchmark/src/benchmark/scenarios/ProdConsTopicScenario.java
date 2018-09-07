@@ -18,7 +18,7 @@ public class ProdConsTopicScenario extends Scenario {
         argsParser = new ProdConsParser(args);
     }
 
-    protected RoundStatistics round() throws MessagingException {
+    protected RoundStatistics round(int round) throws MessagingException {
         MessageTopic topic = messagingContext.createTopicWithStatisticsCollection("messages-topic");
         ArrayList<Thread> threads = new ArrayList<>();
         ArrayList<PaxosWorker> workers = new ArrayList<>();

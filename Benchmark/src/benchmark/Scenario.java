@@ -36,6 +36,9 @@ public abstract class Scenario {
         this.nodeId = paxos.getId();
         this.roundsNo = roundsNo;
         this.args = args;
+        System.out.println("1");
+        initCommitListener();
+        System.out.println("2");
 
         isMaster = nodeId == 0;
 
@@ -51,10 +54,12 @@ public abstract class Scenario {
             };
         }
 
-        initCommitListener();
-        barrier("scenario-statistics-init");
+        System.out.println("3");
 
-        statistics = (TStatistics) PaxosSTM.getInstance().getFromSharedObjectRegistry(statisticsId);
+        barrier("scenario-statistics-init");
+        System.out.println("4");
+
+        statistics = (TStatistics) paxos.getFromSharedObjectRegistry(statisticsId);
     }
 
     static Class<? extends Scenario> getScenarioClass(AvailableScenarios scenarioType) throws ArgumentParsingException {
@@ -74,13 +79,18 @@ public abstract class Scenario {
         return scenarioClass;
     }
 
-    protected abstract RoundStatistics round() throws MessagingException;
+    protected abstract RoundStatistics round(int i) throws MessagingException;
 
     protected long threadsRunner(List<Thread> threads) {
         long start = System.currentTimeMillis();
         try {
-            for (Thread t : threads) t.start();
-            for (Thread t : threads) t.join();
+            for (Thread t : threads){
+                t.start();
+            }
+
+            for (Thread t : threads){
+                t.join();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -101,12 +111,11 @@ public abstract class Scenario {
 
     void run() throws MessagingException {
         barrier("start-scenario");
-        RoundStatistics nodeStatistics = new RoundStatistics();
         for(int i = 0; i < roundsNo; i++) {
             barrier(String.format("start-round-%d", i));
             Logger.log(LogType.Verbose, "########################## Start round %03d ##########################\n", i);
 
-            RoundStatistics roundStatistics = round();
+            RoundStatistics roundStatistics = round(i);
 
             logStats("Round summary", roundStatistics, LogType.Csv);
 
@@ -116,6 +125,7 @@ public abstract class Scenario {
                     statistics.add(roundStatistics);
                 }
             };
+
             barrier(String.format("end-round-%d", i));
             if (isMaster) {
                 RoundStatistics allRound = getValueOfTObject(statistics::get);
@@ -130,25 +140,13 @@ public abstract class Scenario {
             }
 
             makeSnapshot();
-            nodeStatistics = nodeStatistics.add(roundStatistics);
+            System.gc();
+            System.gc();
+            barrier("cleanup");
+            makeSnapshot();
+            System.gc();
+            System.gc();
         }
-
-        Logger.log(LogType.Verbose, "########################## Global summary ##########################");
-        logStats("Node summary", nodeStatistics, LogType.Csv);
-
-        RoundStatistics finalNodeStatistics = nodeStatistics;
-        new Transaction() {
-            @Override
-            public void atomic() {
-                statistics.add(finalNodeStatistics);
-            }
-        };
-        barrier("collect-scenario-stats");
-
-
-        RoundStatistics roundStatistics = getValueOfTObject(statistics::get);
-        roundStatistics.threadExecutionTimes.clear();
-        logStats("All nodes summary", roundStatistics, LogType.CsvMinimal);
     }
 
     private void logStats(String title, RoundStatistics stats, LogType csvType) {
