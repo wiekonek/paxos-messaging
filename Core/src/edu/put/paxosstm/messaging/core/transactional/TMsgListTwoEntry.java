@@ -3,38 +3,33 @@ package edu.put.paxosstm.messaging.core.transactional;
 import edu.put.paxosstm.messaging.core.data.Message;
 import soa.paxosstm.dstm.TransactionObject;
 
-
 @TransactionObject
-public class TBidirectionalMessageList {
-
+public class TMsgListTwoEntry implements TMsgList {
     private TMessageNode _head;
+    private TMessageNode _last;
 
-    public TBidirectionalMessageList() {
+    public TMsgListTwoEntry() {
         _head = null;
+        _last = null;
     }
 
     public Message Dequeue() {
-        if (_head == null) return null;
-
-        TMessageNode tmp = _head;
-
-        while (tmp.next != null) {
-            tmp = tmp.next;
-        }
-
-        if (tmp.prev == null) {
+        if(_last == null) return null;
+        TMessageNode tmp = _last;
+        if(_head == _last) {
             _head = null;
-        } else {
-            tmp.prev.next = null;
         }
-
+        _last = _last.next;
         return tmp.message;
     }
 
     public void Enqueue(Message msg) {
-        TMessageNode n = new TMessageNode(msg, _head, null);
+        TMessageNode n = new TMessageNode(msg, null, _head);
+        if(_head == null) {
+            _last = n;
+        }
         if (_head != null) {
-            _head.prev = n;
+            _head.next = n;
         }
         _head = n;
     }
@@ -49,8 +44,8 @@ public class TBidirectionalMessageList {
             TMessageNode tmp = _head;
 
             while (tmp != null) {
-                builder.insert(1, (tmp.next != null ? ", " : "") + tmp.message);
-                tmp = tmp.next;
+                builder.insert(1, (tmp.prev != null ? ", " : "") + tmp.message);
+                tmp = tmp.prev;
             }
             builder.append("]");
         }

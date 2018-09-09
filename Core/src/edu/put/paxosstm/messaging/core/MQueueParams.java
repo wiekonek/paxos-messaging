@@ -3,6 +3,7 @@ package edu.put.paxosstm.messaging.core;
 import edu.put.paxosstm.messaging.core.queue.QueueSelectionStrategy;
 import edu.put.paxosstm.messaging.core.queue.MQueue;
 import edu.put.paxosstm.messaging.core.queue.MQueueType;
+import edu.put.paxosstm.messaging.core.transactional.TMsgListType;
 
 public class MQueueParams {
 
@@ -12,7 +13,7 @@ public class MQueueParams {
     private MQueueType type = MQueueType.Simple;
 
     /**
-     * Number of concurrent queue for {@link edu.put.paxosstm.messaging.core.MultiMessageQueue}
+     * Number of concurrent queue for {@link MultiMessageQueue}
      */
     private int concurrentQueueNumber = 4;
 
@@ -20,6 +21,38 @@ public class MQueueParams {
      * Strategy for message queue when selecting next consumer
      */
     private QueueSelectionStrategy selectionStrategy = QueueSelectionStrategy.RoundRobin;
+
+    private int retryNumber = 10;
+
+    private int retryDelay = 100;
+
+    private TMsgListType biMsgListType;
+
+
+    /**
+     * Default parameters for creation of {@link MQueue}.
+     *
+     * Create {@link MQueueType#Simple} MQueue.
+     */
+    public MQueueParams() {
+    }
+
+    public MQueueParams(MQueueType type) {
+        this.type = type;
+    }
+
+    public MQueueParams(MQueueType type, int concurrentQueueNumber) {
+       this(type);
+        this.concurrentQueueNumber = concurrentQueueNumber;
+    }
+
+    public MQueueParams(MQueueType type, int concurrentQueueNumber, QueueSelectionStrategy strategy, int retryNumber, int retryDelay, TMsgListType biMsgListType) {
+        this(type, concurrentQueueNumber);
+        this.selectionStrategy = strategy;
+        this.retryNumber = retryNumber;
+        this.retryDelay = retryDelay;
+        this.biMsgListType = biMsgListType;
+    }
 
     /**
      * @return  See {@link #type}
@@ -42,27 +75,15 @@ public class MQueueParams {
         return selectionStrategy;
     }
 
-    /**
-     * Default parameters for creation of {@link MQueue}.
-     *
-     * Create {@link MQueueType#Simple} MQueue.
-     */
-    public MQueueParams() {
+    int getRetryNumber() {
+        return retryNumber;
     }
 
-    public MQueueParams(MQueueType type) {
-        this.type = type;
+    int getRetryDelay() {
+        return retryDelay;
     }
 
-    public MQueueParams(MQueueType type, int concurrentQueueNumber) {
-       this(type);
-        this.concurrentQueueNumber = concurrentQueueNumber;
+    TMsgListType getBiMsgListType() {
+        return biMsgListType;
     }
-
-    public MQueueParams(MQueueType type, int concurrentQueueNumber, QueueSelectionStrategy strategy) {
-        this(type, concurrentQueueNumber);
-        this.selectionStrategy = strategy;
-    }
-
-
 }

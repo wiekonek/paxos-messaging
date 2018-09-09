@@ -1,8 +1,8 @@
 package benchmark;
 
 import benchmark.core.*;
-import benchmark.scenarios.ProdConsScenario;
-import benchmark.scenarios.ProdConsTopicScenario;
+import benchmark.scenarios.SimpleQueueScenario;
+import benchmark.scenarios.SimpleTopicScenario;
 import benchmark.scenarios.workers.PaxosWorker;
 import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import soa.paxosstm.common.CheckpointListener;
@@ -16,14 +16,12 @@ import java.util.List;
 public abstract class Scenario {
 
     protected final BenchmarkMessagingContext messagingContext;
-    @SuppressWarnings("WeakerAccess")
-    protected final PaxosSTM paxos;
-    @SuppressWarnings("WeakerAccess")
-    protected final int nodeId;
     protected final String[] args;
+    protected final int nodesNo;
 
     private static final Object commitLock = new Object();
 
+    private final PaxosSTM paxos;
     private final int roundsNo;
     private final boolean isMaster;
     private final String statisticsId = "statistics";
@@ -33,37 +31,26 @@ public abstract class Scenario {
     public Scenario(int roundsNo, String[] args) {
         this.messagingContext = new BenchmarkMessagingContext();
         this.paxos = PaxosSTM.getInstance();
-        this.nodeId = paxos.getId();
         this.roundsNo = roundsNo;
         this.args = args;
-        System.out.println("1");
+        this.nodesNo = paxos.getNumberOfNodes();
+
         initCommitListener();
-        System.out.println("2");
 
-        isMaster = nodeId == 0;
-
+        isMaster = paxos.getId() == 0;
         if(isMaster) {
             new Transaction() {
                 @Override
                 public void atomic() {
-                    System.out.println("a");
-                    System.err.println("a");
                     if (paxos.getFromSharedObjectRegistry(statisticsId) == null) {
-                        System.out.println("b");
-                        System.err.println("b");
                         TStatistics s = new TStatistics();
                         paxos.addToSharedObjectRegistry(statisticsId, s);
-                        System.out.println("c");
-                        System.err.println("c");
                     }
                 }
             };
         }
 
-        System.out.println("3");
-
         barrier("scenario-statistics-init");
-        System.out.println("4");
 
         statistics = (TStatistics) paxos.getFromSharedObjectRegistry(statisticsId);
     }
@@ -73,10 +60,10 @@ public abstract class Scenario {
 
         switch  (scenarioType) {
             case SimpleQueue:
-                scenarioClass = ProdConsScenario.class;
+                scenarioClass = SimpleQueueScenario.class;
                 break;
             case SimpleTopic:
-                scenarioClass = ProdConsTopicScenario.class;
+                scenarioClass = SimpleTopicScenario.class;
                 break;
             default:
                 System.err.println("No scenario with such a number");
@@ -142,6 +129,7 @@ public abstract class Scenario {
                     }
                 };
                 allRound.threadExecutionTimes.clear();
+                allRound.csvPrefix = roundStatistics.csvPrefix;
                 logStats("Round summary for all nodes", allRound, LogType.CsvMinimal);
             }
 

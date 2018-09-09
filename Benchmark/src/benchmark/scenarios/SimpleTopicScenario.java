@@ -9,11 +9,11 @@ import edu.put.paxosstm.messaging.core.MessageTopic;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-public class ProdConsTopicScenario extends Scenario {
+public class SimpleTopicScenario extends Scenario {
     private final ProdConsParser argsParser;
 
 
-    public ProdConsTopicScenario(int roundsNo, String[] args) {
+    public SimpleTopicScenario(int roundsNo, String[] args) {
         super(roundsNo, args);
         argsParser = new ProdConsParser(args);
     }
@@ -41,7 +41,7 @@ public class ProdConsTopicScenario extends Scenario {
         LinkedHashMap<String, Long> threadExecutionTimes = collectWorkersExecutionTimes(workers);
 
         barrier("stop-round");
-        return new RoundStatistics(topic.getCollectedStatistics(), executionTime, threadExecutionTimes);
+        return new RoundStatistics(topic.getCollectedStatistics(), executionTime, threadExecutionTimes, "");
     }
 
 }

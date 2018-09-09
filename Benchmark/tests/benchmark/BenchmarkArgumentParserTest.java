@@ -56,7 +56,7 @@ class BenchmarkArgumentParserTest {
     @ParameterizedTest(name="[{index}] args: {arguments}")
     @ValueSource(strings = {
             "",
-            "-s SimpleQueue",
+            "-s SimpleQueueScenario",
             "--scenario 0 --ssh --ssh-hosts=asd"
     })
     void constructor_throwException_ifMissingAnyRequiredArgs(String args) throws IOException {
@@ -106,10 +106,10 @@ class BenchmarkArgumentParserTest {
 
     @ParameterizedTest(name="[{index}] for args \"{0}\" should be \"{1}\"")
     @CsvSource({
-            "-n3 --scenario SimpleQueue, SimpleQueue",
-            "-n3 --scenario=SimpleQueue, SimpleQueue",
-            "-n3 -s SimpleQueue, SimpleQueue",
-            "-n3 -s=SimpleQueue, SimpleQueue",
+            "-n3 --scenario SimpleQueueScenario, SimpleQueueScenario",
+            "-n3 --scenario=SimpleQueueScenario, SimpleQueueScenario",
+            "-n3 -s SimpleQueueScenario, SimpleQueueScenario",
+            "-n3 -s=SimpleQueueScenario, SimpleQueueScenario",
     })
     void getScenarioType_returnScenarioType_ifScenarioTypeInMultipleFormats(String args, AvailableScenarios expectedScenarioType) throws IOException, ArgumentParsingException {
         BenchmarkArgumentParser parser = new BenchmarkArgumentParser(toArgs(args));

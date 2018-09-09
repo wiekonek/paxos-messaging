@@ -12,8 +12,6 @@ public class EmptyQueueConsumer extends PaxosWorker {
 
     @Override
     public void measuredRun() {
-        System.out.println("start: " + getId());
         queue.runConsumer((ignore) -> {});
-        System.out.println("end: " + getId());
     }
 }

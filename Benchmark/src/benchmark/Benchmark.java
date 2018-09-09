@@ -91,9 +91,6 @@ public class Benchmark {
             timeouts[i] = arguments.getTimeout();
         }
         System.out.println("Start benchmarking");
-        for (Command cmd: commands) {
-            System.out.println(cmd.toString());
-        }
         runners.BenchmarkRunner.runConcurrentCommands(commands, timeouts, outFilenames, errFilenames, 1);
         System.out.println("Finished");
     }
@@ -109,7 +106,7 @@ public class Benchmark {
         }
         Parameters.SYSTEM_PROPERTIES =
                 "-Dlogback.configurationFile=file://" + Parameters.WORKSPACE + "/PaxosSTM/logback.xml";
-        Parameters.JVM_SETTINGS = "-Xmx256m -Xms256m -Xmn128m";
+        Parameters.JVM_SETTINGS = "-Xmx4g -Xms512m";
     }
 
 

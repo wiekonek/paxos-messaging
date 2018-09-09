@@ -22,7 +22,7 @@ public class ScenarioRunner {
             return;
         }
         Logger.logType = benchmarkArgs.getLogType();
-        Logger.log(LogType.All, "[%s]\n", benchmarkArgs);
+        Logger.log(LogType.Verbose, "[%s]\n", benchmarkArgs);
 
         PaxosSTM paxos = PaxosSTM.getInstance();
         try {

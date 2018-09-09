@@ -14,20 +14,27 @@ public class RoundStatistics implements Serializable {
         this.statistics = new Statistics();
         this.executionTime = 0;
         this.threadExecutionTimes = new LinkedHashMap<>();
+        this.csvPrefix = "";
     }
 
-    public RoundStatistics(Statistics statistics, long executionTime, Map<String, Long> threadExecutionTimes) {
+    public RoundStatistics(Statistics statistics, long executionTime, Map<String, Long> threadExecutionTimes, String csvPrefix) {
         this.statistics = statistics;
         this.executionTime = executionTime;
         this.threadExecutionTimes = threadExecutionTimes;
+        this.csvPrefix = csvPrefix;
     }
 
     public final Statistics statistics;
     public final long executionTime;
+    public String csvPrefix;
     public final Map<String, Long> threadExecutionTimes;
 
     public String getCsv() {
         StringBuilder builder = new StringBuilder();
+        if (!csvPrefix.isEmpty()) {
+            builder.append(csvPrefix);
+            builder.append(",");
+        }
         builder.append(executionTime);
         builder.append(",");
         builder.append(statistics.toCsv());
@@ -66,6 +73,6 @@ public class RoundStatistics implements Serializable {
             );
         }
 
-        return new RoundStatistics(s, t, tt);
+        return new RoundStatistics(s, t, tt, "");
     }
 }
