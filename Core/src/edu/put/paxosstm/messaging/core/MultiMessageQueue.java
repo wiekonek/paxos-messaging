@@ -81,11 +81,11 @@ class MultiMessageQueue extends MessageQueue {
                 msg[0] = tMessageLists[currentQueue].Dequeue();
                 currentQueue = nextQueueNo(currentQueue);
                 if (msg[0] == null) {
-                    if (retry < retryNo * maxRetryNumber) {
+                    if (retry < retryNo * concurrentQueueNumber) {
                         retry++;
-                        if (retry % retryNo == 0) {
+                        if (retry % concurrentQueueNumber == 0) {
                             try {
-                                Thread.sleep(retryDelay);
+                                Thread.sleep(retryDelay); // TODO: Przenieść na zewnątrz
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }

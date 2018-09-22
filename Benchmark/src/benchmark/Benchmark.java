@@ -106,7 +106,7 @@ public class Benchmark {
         }
         Parameters.SYSTEM_PROPERTIES =
                 "-Dlogback.configurationFile=file://" + Parameters.WORKSPACE + "/PaxosSTM/logback.xml";
-        Parameters.JVM_SETTINGS = "-Xmx4g -Xms512m";
+        Parameters.JVM_SETTINGS = "-Xmx2g -Xms512m";
     }
 
 
