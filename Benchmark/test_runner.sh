@@ -59,7 +59,12 @@ do
     hosts=""
     for HostNo in $(seq 1 ${NodesNo})
     do
-        hosts+="hpc-$HostNo,"
+        if [ ${HostNo} -eq 4 ]
+        then
+            hosts+="hpc-12,"
+        else
+            hosts+="hpc-$HostNo,"
+        fi
     done
     hosts=${hosts::-1}
 
@@ -81,7 +86,12 @@ ConsumersNo=80
 hosts=""
 for HostNo in $(seq 1 ${NodesNo})
 do
-    hosts+="hpc-$HostNo,"
+    if [ ${HostNo} -eq 4 ]
+    then
+        hosts+="hpc-12,"
+    else
+        hosts+="hpc-$HostNo,"
+    fi
 done
 hosts=${hosts::-1}
 
@@ -105,7 +115,12 @@ QueueNo=2000
 hosts=""
 for HostNo in $(seq 1 ${NodesNo})
 do
-    hosts+="hpc-$HostNo,"
+    if [ ${HostNo} -eq 4 ]
+    then
+        hosts+="hpc-12,"
+    else
+        hosts+="hpc-$HostNo,"
+    fi
 done
 hosts=${hosts::-1}
 
@@ -128,7 +143,12 @@ QueueNo=2000
 hosts=""
 for HostNo in $(seq 1 ${NodesNo})
 do
-    hosts+="hpc-$HostNo,"
+    if [ ${HostNo} -eq 4 ]
+    then
+        hosts+="hpc-12,"
+    else
+        hosts+="hpc-$HostNo,"
+    fi
 done
 hosts=${hosts::-1}
 
@@ -146,7 +166,7 @@ done
 
 
 echo "5. Test nodes scaling"
-for NodesNo in {4..12..1}
+for NodesNo in {4..11..1}
 do
     ProductsNo=200000
     ProducersNo=65
@@ -157,7 +177,12 @@ do
     hosts=""
     for HostNo in $(seq 1 ${NodesNo})
     do
-        hosts+="hpc-$HostNo,"
+        if [ ${HostNo} -eq 4 ]
+        then
+            hosts+="hpc-12,"
+        else
+            hosts+="hpc-$HostNo,"
+        fi
     done
     hosts=${hosts::-1}
 

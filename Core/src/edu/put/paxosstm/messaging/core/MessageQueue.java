@@ -10,12 +10,14 @@ public abstract class MessageQueue extends TransactionStatisticsCollector implem
     @Override
     public void runConsumer(MessageConsumer messageConsumer) {
         while (true) {
-            Message msg = receiveMessage();
+            Message msg = getMessage();
             if (msg == null) {
                 break;
             }
             messageConsumer.consumeMessage(msg);
         }
     }
+
+    protected abstract Message getMessage();
 
 }

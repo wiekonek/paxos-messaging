@@ -63,14 +63,26 @@ class MultiMessageQueue extends MessageQueue {
         currentQueue = nextQueueNo(currentQueue);
     }
 
-
     @Override
     public Message receiveMessage() {
-        return receiveMessage(maxRetryNumber, retryDelay);
+        final Message[] msg = new Message[1];
+        new CoreTransaction() {
+            @Override
+            public void atomic() {
+                msg[0] = tMessageLists[currentQueue].Dequeue();
+                currentQueue = nextQueueNo(currentQueue);
+            }
+        };
+        return msg[0];
     }
 
+
     @Override
-    public Message receiveMessage(int retryNo, int retryDelay) {
+    protected Message getMessage() {
+        return getMessage(maxRetryNumber, retryDelay);
+    }
+
+    protected Message getMessage(int retryNo, int retryDelay) {
         final Message[] msg = new Message[1];
 
         new CoreTransaction() {

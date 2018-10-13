@@ -39,7 +39,12 @@ public class TransactionStatisticsCollector implements MStatistics {
         switch (statistics.getState()) {
             case Committed:
                 stats.commits++;
-                stats.committedExecTime += statistics.getExecutionTime(); //mili lub micro sekundy
+                stats.committedExecTime += statistics.getExecutionTime();
+                collectedStatistics.committedPSize.packageSize += statistics.getPackageSize();
+                collectedStatistics.committedPSize.readSetSize += statistics.getReadSetSize();
+                collectedStatistics.committedPSize.writeSetSize += statistics.getWriteSetSize();
+                collectedStatistics.committedPSize.newSetSize += statistics.getNewSetSize();
+                collectedStatistics.committedPSize.typeSetSize += statistics.getTypeSetSize();
                 break;
             case RolledBack:
                 stats.rollbacks++;
@@ -48,6 +53,11 @@ public class TransactionStatisticsCollector implements MStatistics {
             case GlobalAbort:
                 stats.globalAborts++;
                 stats.globalAbortedExecTime += statistics.getExecutionTime();
+                collectedStatistics.globalAbortedPSize.packageSize += statistics.getPackageSize();
+                collectedStatistics.globalAbortedPSize.readSetSize += statistics.getReadSetSize();
+                collectedStatistics.globalAbortedPSize.writeSetSize += statistics.getWriteSetSize();
+                collectedStatistics.globalAbortedPSize.newSetSize += statistics.getNewSetSize();
+                collectedStatistics.globalAbortedPSize.typeSetSize += statistics.getTypeSetSize();
                 break;
             case LocalAbort:
                 stats.localAborts++;

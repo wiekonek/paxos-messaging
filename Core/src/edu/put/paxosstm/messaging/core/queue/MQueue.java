@@ -5,7 +5,11 @@ import edu.put.paxosstm.messaging.core.data.Message;
 
 public interface MQueue {
     void sendMessage(Message msg);
+
+    /**
+     * @return May return null
+     */
     Message receiveMessage();
-    Message receiveMessage(int retryNo, int retryDelay);
+
     void runConsumer(MessageConsumer consumer);
 }
