@@ -1,6 +1,6 @@
 package edu.put.paxosstm.messaging.benchmark.scenarios.workers;
 
-import edu.put.paxosstm.messaging.core.topics.MTopic;
+import edu.put.paxosstm.messaging.topics.MTopic;
 
 public class SimpleSubscriber extends PaxosWorker {
 
@@ -13,6 +13,6 @@ public class SimpleSubscriber extends PaxosWorker {
 
     @Override
     public void measuredRun() {
-        topic.registerSubscriber(msg -> {});
+        topic.registerSubscriber(msg -> {/*log(msg.toString());*/});
     }
 }

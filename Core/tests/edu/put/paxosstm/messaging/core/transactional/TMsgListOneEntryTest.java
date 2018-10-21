@@ -1,6 +1,6 @@
 package edu.put.paxosstm.messaging.core.transactional;
 
-import edu.put.paxosstm.messaging.core.data.Message;
+import edu.put.paxosstm.messaging.data.Message;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

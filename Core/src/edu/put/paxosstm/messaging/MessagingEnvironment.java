@@ -1,8 +1,6 @@
 package edu.put.paxosstm.messaging;
 
 import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
-import edu.put.paxosstm.messaging.core.ApplicationRunner;
-import edu.put.paxosstm.messaging.core.MessagingApp;
 import soa.paxosstm.tools.Tools;
 
 import java.util.stream.Stream;
@@ -20,7 +18,7 @@ public class MessagingEnvironment {
      * @param params Params for your application (passed to {@link MessagingApp#application(String[])}).
      * @param <T> Your application type.
      */
-    public static <T extends MessagingApp> void startEnvironment(MessagingConfig config, Class<T> app, String... params) throws MessagingException {
+    public static <T extends MessagingApp> void startEnvironment(MessagingEnvironmentConfig config, Class<T> app, String... params) throws MessagingException {
         if (!config.isInitializedProperly()) throw new MessagingException("Config not initialized properly!");
 
         try {

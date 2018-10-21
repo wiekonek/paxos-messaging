@@ -1,12 +1,13 @@
 package edu.put.paxosstm.messaging.examples;
 
 import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
+import edu.put.paxosstm.messaging.MessagingTransaction;
 import edu.put.paxosstm.messaging.consumers.MessageLogger;
-import edu.put.paxosstm.messaging.core.MQueueParams;
-import edu.put.paxosstm.messaging.core.MessagingApp;
-import edu.put.paxosstm.messaging.core.data.Message;
-import edu.put.paxosstm.messaging.core.queue.MQueue;
-import edu.put.paxosstm.messaging.core.queue.MQueueType;
+import edu.put.paxosstm.messaging.MQueueParams;
+import edu.put.paxosstm.messaging.MessagingApp;
+import edu.put.paxosstm.messaging.data.Message;
+import edu.put.paxosstm.messaging.queue.MQueue;
+import edu.put.paxosstm.messaging.queue.MQueueType;
 
 public class App extends MessagingApp {
 

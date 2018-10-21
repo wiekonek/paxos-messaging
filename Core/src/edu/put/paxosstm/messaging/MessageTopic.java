@@ -1,9 +1,9 @@
-package edu.put.paxosstm.messaging.core;
+package edu.put.paxosstm.messaging;
 
 import edu.put.paxosstm.messaging.consumers.MessageConsumer;
-import edu.put.paxosstm.messaging.core.data.Message;
-import edu.put.paxosstm.messaging.core.data.MessageWithIndex;
-import edu.put.paxosstm.messaging.core.topics.MTopic;
+import edu.put.paxosstm.messaging.data.Message;
+import edu.put.paxosstm.messaging.data.MessageWithIndex;
+import edu.put.paxosstm.messaging.topics.MTopic;
 import edu.put.paxosstm.messaging.core.transactional.TTopicHelper;
 import edu.put.paxosstm.messaging.core.utils.TransactionStatisticsCollector;
 import soa.paxosstm.dstm.PaxosSTM;
@@ -11,23 +11,26 @@ import soa.paxosstm.dstm.Transaction;
 
 public class MessageTopic extends TransactionStatisticsCollector implements MTopic {
 
-    private final TTopicHelper tHelper;
+    private TTopicHelper tHelper;
+    private final String id;
     private final int maxRetryNumber;
 
     MessageTopic(String id) {
-        this(id, 3);
+        this(id, 3, 10000);
     }
 
-    MessageTopic(String id, int maxRetryNumber) {
+    MessageTopic(String id, int maxRetryNumber, int bufferSize) {
+        this.id = id;
         this.maxRetryNumber = maxRetryNumber;
         new Transaction() {
             @Override
             public void atomic() {
                 PaxosSTM paxos = PaxosSTM.getInstance();
                 if (paxos.getFromSharedObjectRegistry(id) == null) {
-                    TTopicHelper list = new TTopicHelper();
+                    TTopicHelper list = new TTopicHelper(bufferSize);
                     paxos.addToSharedObjectRegistry(id, list);
                 }
+
             }
         };
         tHelper = (TTopicHelper) PaxosSTM.getInstance().getFromSharedObjectRegistry(id);
@@ -94,6 +97,7 @@ public class MessageTopic extends TransactionStatisticsCollector implements MTop
                             index[0]--;
                             retry();
                         }
+                        index[0] = msg[0].getIndex();
                     }
 
                 };
@@ -109,5 +113,21 @@ public class MessageTopic extends TransactionStatisticsCollector implements MTop
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void clean() {
+        System.out.println("Cleaning!!!");
+        new Transaction() {
+            @Override
+            public void atomic() {
+                tHelper.clean();
+                PaxosSTM paxos = PaxosSTM.getInstance();
+                paxos.removeFromSharedObjectRegistry(id);
+                TTopicHelper list = new TTopicHelper(1000);
+                paxos.addToSharedObjectRegistry(id, list);
+            }
+        };
+        tHelper = (TTopicHelper) PaxosSTM.getInstance().getFromSharedObjectRegistry(id);
     }
 }

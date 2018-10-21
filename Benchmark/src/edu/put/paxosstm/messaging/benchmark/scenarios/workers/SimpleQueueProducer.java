@@ -1,11 +1,9 @@
 package edu.put.paxosstm.messaging.benchmark.scenarios.workers;
 
 import edu.put.paxosstm.messaging.benchmark.core.BenchmarkMessagingContext;
-import edu.put.paxosstm.messaging.benchmark.core.LogType;
-import edu.put.paxosstm.messaging.benchmark.core.Logger;
-import edu.put.paxosstm.messaging.core.MessagingContext;
-import edu.put.paxosstm.messaging.core.data.Message;
-import edu.put.paxosstm.messaging.core.queue.MQueue;
+import edu.put.paxosstm.messaging.MessagingContext;
+import edu.put.paxosstm.messaging.data.Message;
+import edu.put.paxosstm.messaging.queue.MQueue;
 
 public class SimpleQueueProducer extends PaxosWorker {
 

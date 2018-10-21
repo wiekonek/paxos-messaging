@@ -1,4 +1,4 @@
-package edu.put.paxosstm.messaging.core.queue;
+package edu.put.paxosstm.messaging.queue;
 
 public enum QueueSelectionStrategy {
     RoundRobin,

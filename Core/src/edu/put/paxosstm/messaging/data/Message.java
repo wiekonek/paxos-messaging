@@ -1,4 +1,4 @@
-package edu.put.paxosstm.messaging.core.data;
+package edu.put.paxosstm.messaging.data;
 
 import java.io.Serializable;
 

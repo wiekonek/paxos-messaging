@@ -6,9 +6,9 @@ import edu.put.paxosstm.messaging.benchmark.scenarios.workers.PaxosWorker;
 import edu.put.paxosstm.messaging.benchmark.scenarios.workers.EmptyQueueConsumer;
 import edu.put.paxosstm.messaging.benchmark.scenarios.workers.SimpleQueueProducer;
 import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
-import edu.put.paxosstm.messaging.core.MQueueParams;
-import edu.put.paxosstm.messaging.core.MessageQueue;
-import edu.put.paxosstm.messaging.core.queue.MQueueType;
+import edu.put.paxosstm.messaging.MQueueParams;
+import edu.put.paxosstm.messaging.MessageQueue;
+import edu.put.paxosstm.messaging.queue.MQueueType;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

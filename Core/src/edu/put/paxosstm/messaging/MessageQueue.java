@@ -1,8 +1,8 @@
-package edu.put.paxosstm.messaging.core;
+package edu.put.paxosstm.messaging;
 
 import edu.put.paxosstm.messaging.consumers.MessageConsumer;
-import edu.put.paxosstm.messaging.core.data.Message;
-import edu.put.paxosstm.messaging.core.queue.MQueue;
+import edu.put.paxosstm.messaging.data.Message;
+import edu.put.paxosstm.messaging.queue.MQueue;
 import edu.put.paxosstm.messaging.core.utils.TransactionStatisticsCollector;
 
 public abstract class MessageQueue extends TransactionStatisticsCollector implements MQueue {

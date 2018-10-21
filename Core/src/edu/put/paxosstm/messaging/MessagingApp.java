@@ -1,4 +1,4 @@
-package edu.put.paxosstm.messaging.core;
+package edu.put.paxosstm.messaging;
 
 import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import soa.paxosstm.dstm.PaxosSTM;

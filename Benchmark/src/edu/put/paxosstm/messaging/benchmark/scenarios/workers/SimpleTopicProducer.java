@@ -1,9 +1,9 @@
 package edu.put.paxosstm.messaging.benchmark.scenarios.workers;
 
 import edu.put.paxosstm.messaging.benchmark.core.BenchmarkMessagingContext;
-import edu.put.paxosstm.messaging.core.MessagingContext;
-import edu.put.paxosstm.messaging.core.data.Message;
-import edu.put.paxosstm.messaging.core.topics.MTopic;
+import edu.put.paxosstm.messaging.MessagingContext;
+import edu.put.paxosstm.messaging.data.Message;
+import edu.put.paxosstm.messaging.topics.MTopic;
 
 public class SimpleTopicProducer extends PaxosWorker {
     private final MessagingContext context;

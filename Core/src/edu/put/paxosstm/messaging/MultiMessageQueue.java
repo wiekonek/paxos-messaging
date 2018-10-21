@@ -1,7 +1,7 @@
-package edu.put.paxosstm.messaging.core;
+package edu.put.paxosstm.messaging;
 
-import edu.put.paxosstm.messaging.core.data.Message;
-import edu.put.paxosstm.messaging.core.queue.QueueSelectionStrategy;
+import edu.put.paxosstm.messaging.data.Message;
+import edu.put.paxosstm.messaging.queue.QueueSelectionStrategy;
 import edu.put.paxosstm.messaging.core.transactional.TMsgList;
 import edu.put.paxosstm.messaging.core.transactional.TMsgListFactory;
 import soa.paxosstm.dstm.PaxosSTM;
@@ -51,16 +51,28 @@ class MultiMessageQueue extends MessageQueue {
     }
 
     @Override
-    public void sendMessage(Message msg) {
-
+    public int sendMessage(Message msg) {
+        int tListNumber = currentQueue;
         new CoreTransaction() {
             @Override
             public void atomic() {
-                tMessageLists[currentQueue].Enqueue(msg);
+                tMessageLists[tListNumber].Enqueue(msg);
             }
         };
 
         currentQueue = nextQueueNo(currentQueue);
+        return tListNumber;
+    }
+
+    @Override
+    public int sendMessage(Message msg, int tListNumber) {
+        new CoreTransaction() {
+            @Override
+            public void atomic() {
+                tMessageLists[tListNumber % concurrentQueueNumber].Enqueue(msg);
+            }
+        };
+        return tListNumber;
     }
 
     @Override

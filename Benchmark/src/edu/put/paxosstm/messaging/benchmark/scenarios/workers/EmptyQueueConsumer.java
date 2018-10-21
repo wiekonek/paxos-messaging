@@ -1,6 +1,6 @@
 package edu.put.paxosstm.messaging.benchmark.scenarios.workers;
 
-import edu.put.paxosstm.messaging.core.queue.MQueue;
+import edu.put.paxosstm.messaging.queue.MQueue;
 
 public class EmptyQueueConsumer extends PaxosWorker {
     private final MQueue queue;

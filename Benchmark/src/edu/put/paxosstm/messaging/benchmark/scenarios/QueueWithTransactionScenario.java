@@ -7,9 +7,9 @@ import edu.put.paxosstm.messaging.benchmark.core.Logger;
 import edu.put.paxosstm.messaging.benchmark.scenarios.workers.EmptyTwoQueueConsumer;
 import edu.put.paxosstm.messaging.benchmark.scenarios.workers.PaxosWorker;
 import edu.put.paxosstm.messaging.benchmark.scenarios.workers.SimpleQueueProducer;
-import edu.put.paxosstm.messaging.core.MQueueParams;
-import edu.put.paxosstm.messaging.core.MessageQueue;
-import edu.put.paxosstm.messaging.core.queue.MQueueType;
+import edu.put.paxosstm.messaging.MQueueParams;
+import edu.put.paxosstm.messaging.MessageQueue;
+import edu.put.paxosstm.messaging.queue.MQueueType;
 import edu.put.paxosstm.messaging.core.utils.Statistics;
 
 import java.util.ArrayList;
@@ -47,12 +47,13 @@ public class QueueWithTransactionScenario extends SimpleQueueScenario {
 
         int consumersNo = argsParser.getConsumersNo();
         for (int i = 0; i < consumersNo; i++) {
-            PaxosWorker worker = new EmptyTwoQueueConsumer(q1, q2, i);
+            PaxosWorker worker = new EmptyTwoQueueConsumer(q1, q2, i,
+                    argsParser.getConcurrentQueueNo(), argsParser.getRetryNumber(), argsParser.getRetryDelay());
             workers.add(worker);
             threads.add(new Thread(worker));
         }
 
-        long executionTime = threadsRunner(threads);
+        long executionTime = threadsRunner(threads) - (argsParser.getRetryDelay() * argsParser.getRetryNumber());
 
         LinkedHashMap<String, Long> threadExecutionTimes = collectWorkersExecutionTimes(workers);
 

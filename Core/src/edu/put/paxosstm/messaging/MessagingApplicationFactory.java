@@ -1,4 +1,4 @@
-package edu.put.paxosstm.messaging.core;
+package edu.put.paxosstm.messaging;
 
 class MessagingApplicationFactory {
     static MessagingApp createApplication(String applicationClassName) throws

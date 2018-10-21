@@ -6,7 +6,8 @@ import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import edu.put.paxosstm.messaging.benchmark.scenarios.workers.PaxosWorker;
 import edu.put.paxosstm.messaging.benchmark.scenarios.workers.SimpleSubscriber;
 import edu.put.paxosstm.messaging.benchmark.scenarios.workers.SimpleTopicProducer;
-import edu.put.paxosstm.messaging.core.MessageTopic;
+import edu.put.paxosstm.messaging.MessageTopic;
+import soa.paxosstm.dstm.Transaction;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -21,7 +22,7 @@ public class SimpleTopicScenario extends Scenario {
     }
 
     protected RoundStatistics round(int round) throws MessagingException {
-        MessageTopic topic = messagingContext.createTopicWithStatisticsCollection("messages-topic");
+        MessageTopic topic = messagingContext.createTopicWithStatisticsCollection("messages-topic", 5000);
         ArrayList<Thread> threads = new ArrayList<>();
         ArrayList<PaxosWorker> workers = new ArrayList<>();
         barrier("init-round");
@@ -43,6 +44,16 @@ public class SimpleTopicScenario extends Scenario {
         LinkedHashMap<String, Long> threadExecutionTimes = collectWorkersExecutionTimes(workers);
 
         barrier("stop-round");
+        if(isMaster) {
+            topic.clean();
+            new Transaction() {
+                @Override
+                public void atomic() {
+                    paxos.removeFromSharedObjectRegistry("messages-topic");
+                }
+            };
+        }
+
         return new RoundStatistics(topic.getCollectedStatistics(), executionTime, threadExecutionTimes, "");
     }
 

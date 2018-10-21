@@ -1,4 +1,4 @@
-package edu.put.paxosstm.messaging.core;
+package edu.put.paxosstm.messaging;
 
 import edu.put.paxosstm.messaging.core.utils.OracleInitializer;
 import soa.paxosstm.dstm.PaxosSTM;

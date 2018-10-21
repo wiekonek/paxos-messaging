@@ -1,4 +1,4 @@
-package edu.put.paxosstm.messaging.core;
+package edu.put.paxosstm.messaging;
 
 import soa.paxosstm.dstm.Transaction;
 

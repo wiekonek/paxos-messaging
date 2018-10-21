@@ -1,10 +1,12 @@
-package edu.put.paxosstm.messaging.core.queue;
+package edu.put.paxosstm.messaging.queue;
 
 import edu.put.paxosstm.messaging.consumers.MessageConsumer;
-import edu.put.paxosstm.messaging.core.data.Message;
+import edu.put.paxosstm.messaging.data.Message;
 
 public interface MQueue {
-    void sendMessage(Message msg);
+    int sendMessage(Message msg);
+
+    int sendMessage(Message msg, int tListId);
 
     /**
      * @return May return null

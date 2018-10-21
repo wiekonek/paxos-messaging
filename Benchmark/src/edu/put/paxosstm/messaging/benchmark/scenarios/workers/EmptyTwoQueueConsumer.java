@@ -1,19 +1,23 @@
 package edu.put.paxosstm.messaging.benchmark.scenarios.workers;
 
-import edu.put.paxosstm.messaging.core.data.Message;
-import edu.put.paxosstm.messaging.core.queue.MQueue;
+import edu.put.paxosstm.messaging.data.Message;
+import edu.put.paxosstm.messaging.queue.MQueue;
 
 public class EmptyTwoQueueConsumer extends PaxosWorker {
 
     private final MQueue q1;
     private final MQueue q2;
     private final int tListHelpers;
+    private final int retryNo;
+    private final int retryDelay;
 
-    public EmptyTwoQueueConsumer(MQueue q1, MQueue q2, int workerThreadId, int tListHelpers) {
+    public EmptyTwoQueueConsumer(MQueue q1, MQueue q2, int workerThreadId, int tListHelpers, int retryNo, int retryDelay) {
         super(workerThreadId);
         this.q1 = q1;
         this.q2 = q2;
         this.tListHelpers = tListHelpers;
+        this.retryNo = retryNo;
+        this.retryDelay = retryDelay;
     }
 
     @Override
@@ -46,11 +50,11 @@ public class EmptyTwoQueueConsumer extends PaxosWorker {
             };
 
             if (m1[0] == null || m2[0] == null) {
-                if (retry < 4 * tListHelpers) {
+                if (retry < retryNo * tListHelpers) {
                     retry++;
                     try {
                         if(retry % tListHelpers == 0)
-                        Thread.sleep(100);
+                        Thread.sleep(retryDelay);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

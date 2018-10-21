@@ -1,8 +1,8 @@
-package edu.put.paxosstm.messaging.core;
+package edu.put.paxosstm.messaging;
 
-import edu.put.paxosstm.messaging.core.queue.QueueSelectionStrategy;
-import edu.put.paxosstm.messaging.core.queue.MQueue;
-import edu.put.paxosstm.messaging.core.queue.MQueueType;
+import edu.put.paxosstm.messaging.queue.QueueSelectionStrategy;
+import edu.put.paxosstm.messaging.queue.MQueue;
+import edu.put.paxosstm.messaging.queue.MQueueType;
 import edu.put.paxosstm.messaging.core.transactional.TMsgListType;
 
 public class MQueueParams {

@@ -1,4 +1,4 @@
-package edu.put.paxosstm.messaging.core.data;
+package edu.put.paxosstm.messaging.data;
 
 public class MessageWithIndex extends Message {
     private final int index;

@@ -1,6 +1,6 @@
 package edu.put.paxosstm.messaging.benchmark.scenarios;
 
-import edu.put.paxosstm.messaging.core.queue.QueueSelectionStrategy;
+import edu.put.paxosstm.messaging.queue.QueueSelectionStrategy;
 import edu.put.paxosstm.messaging.core.transactional.TMsgListType;
 import joptsimple.ArgumentAcceptingOptionSpec;
 

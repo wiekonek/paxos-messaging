@@ -5,7 +5,7 @@ import java.util.Arrays;
 /**
  * Configuration of PaxosMessaging.
  */
-public class MessagingConfig {
+public class MessagingEnvironmentConfig {
     public static class Node {
 
         private final int id;
@@ -37,7 +37,7 @@ public class MessagingConfig {
      * Create configuration for specific node.
      * @param nodeId Id of node (must be in nodes).
      */
-    public MessagingConfig(int nodeId) {
+    public MessagingEnvironmentConfig(int nodeId) {
         this(nodeId, null);
     }
 
@@ -46,7 +46,7 @@ public class MessagingConfig {
      * @param nodeId Id of node (must be in nodes).
      * @param nodes
      */
-    private MessagingConfig(int nodeId, Node[] nodes) {
+    private MessagingEnvironmentConfig(int nodeId, Node[] nodes) {
         this.nodeId = nodeId;
         if(nodes == null) {
             this.nodes = new Node[0];
@@ -56,21 +56,21 @@ public class MessagingConfig {
     }
 
     /**
-     * Create new {@link MessagingConfig} and add specified node.
+     * Create new {@link MessagingEnvironmentConfig} and add specified node.
      * This method may be chained to create config with multiple nodes.
      * @param nodeId Id of node.
      * @param hostname Hostname of node.
      * @param clientPort Client port.
      * @param replicaPort Replica port.
-     * @return Return new {@link MessagingConfig}.
+     * @return Return new {@link MessagingEnvironmentConfig}.
      */
-    public MessagingConfig withNode(int nodeId, String hostname, int clientPort, int replicaPort) {
+    public MessagingEnvironmentConfig withNode(int nodeId, String hostname, int clientPort, int replicaPort) {
         Node[] newNodes = new Node[nodes.length + 1];
         for (int i = 0; i < nodes.length; i++) {
             newNodes[i] = nodes[i];
         }
         newNodes[nodes.length] = new Node(nodeId, hostname, replicaPort, clientPort);
-        return new MessagingConfig(this.nodeId, newNodes);
+        return new MessagingEnvironmentConfig(this.nodeId, newNodes);
     }
 
     /**

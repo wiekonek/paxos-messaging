@@ -1,7 +1,7 @@
 package edu.put.paxosstm.messaging.core.transactional;
 
-import edu.put.paxosstm.messaging.core.data.Message;
-import edu.put.paxosstm.messaging.core.data.MessageWithIndex;
+import edu.put.paxosstm.messaging.data.Message;
+import edu.put.paxosstm.messaging.data.MessageWithIndex;
 import soa.paxosstm.dstm.ArrayWrapper;
 import soa.paxosstm.dstm.TransactionObject;
 
@@ -14,7 +14,7 @@ public class TTopicHelper {
 
 
     public TTopicHelper() {
-        this(10000);
+        this(1000);
     }
 
     public TTopicHelper(int bufferSize) {
@@ -25,14 +25,26 @@ public class TTopicHelper {
 
     public MessageWithIndex getNewest() {
         if (newestIndex == -1) return null;
-        return new MessageWithIndex(tArray.get(newestIndex % bufferSize), newestIndex);
+        return new MessageWithIndex(
+                tArray.get(newestIndex % bufferSize),
+                newestIndex
+        );
+    }
+
+    public MessageWithIndex getOldest() {
+        if (newestIndex == -1) return null;
+        if(newestIndex < bufferSize) {
+            return new MessageWithIndex(tArray.get(0), 0);
+        }
+        int oldest = newestIndex - bufferSize + 1;
+        return new MessageWithIndex(tArray.get(oldest), oldest);
     }
 
     public MessageWithIndex get(int i) {
         if (newestIndex == -1 || i > newestIndex) {
             return null;
         }
-        int oldest = newestIndex - bufferSize;
+        int oldest = newestIndex - bufferSize + 1;
         if (i < oldest) {
             return new MessageWithIndex(tArray.get(oldest % bufferSize), oldest);
         } else {
@@ -43,5 +55,11 @@ public class TTopicHelper {
     public void add(Message message) {
         newestIndex++;
         tArray.set(newestIndex % bufferSize, message.getData());
+    }
+
+    public void clean() {
+        String[] internalArray = new String[bufferSize];
+        tArray = new ArrayWrapper<>(internalArray);
+        newestIndex = -1;
     }
 }

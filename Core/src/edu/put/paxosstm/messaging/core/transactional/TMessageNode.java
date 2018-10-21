@@ -1,6 +1,6 @@
 package edu.put.paxosstm.messaging.core.transactional;
 
-import edu.put.paxosstm.messaging.core.data.Message;
+import edu.put.paxosstm.messaging.data.Message;
 import soa.paxosstm.dstm.TransactionObject;
 
 @TransactionObject

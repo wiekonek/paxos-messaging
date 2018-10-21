@@ -23,9 +23,9 @@ public abstract class Scenario {
 
     private static final Object commitLock = new Object();
 
-    private final PaxosSTM paxos;
+    protected final PaxosSTM paxos;
     private final int roundsNo;
-    private final boolean isMaster;
+    protected final boolean isMaster;
     private final String statisticsId = "statistics";
     private final TStatistics statistics;
 
@@ -138,6 +138,7 @@ public abstract class Scenario {
                 logStats("Round summary for all nodes", allRound, LogType.CsvMinimal);
             }
 
+            makeSnapshot();
             makeSnapshot();
             System.gc();
             System.gc();

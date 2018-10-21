@@ -1,9 +1,8 @@
-package edu.put.paxosstm.messaging.core;
+package edu.put.paxosstm.messaging;
 
 import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
-import edu.put.paxosstm.messaging.core.queue.MQueue;
-import edu.put.paxosstm.messaging.core.queue.QueueSelectionStrategy;
-import edu.put.paxosstm.messaging.core.topics.MTopic;
+import edu.put.paxosstm.messaging.queue.MQueue;
+import edu.put.paxosstm.messaging.topics.MTopic;
 import edu.put.paxosstm.messaging.core.utils.TransactionStatisticsCollector;
 
 public class MessagingContext extends TransactionStatisticsCollector {
@@ -19,8 +18,8 @@ public class MessagingContext extends TransactionStatisticsCollector {
         return createQueue(identifier, params, false);
     }
 
-    public MTopic createTopic(String identifier) throws MessagingException {
-        return createTopic(identifier, false);
+    public MTopic createTopic(String identifier, int bufferSize) throws MessagingException {
+        return createTopic(identifier, bufferSize, false );
     }
 
     public void transactionAction(Runnable action) {
@@ -50,8 +49,8 @@ public class MessagingContext extends TransactionStatisticsCollector {
         return queue;
     }
 
-    protected MessageTopic createTopic(String identifier, boolean collectStatistics) throws MessagingException {
-        MessageTopic topic = new MessageTopic(identifier);
+    protected MessageTopic createTopic(String identifier, int bufferSize, boolean collectStatistics) throws MessagingException {
+        MessageTopic topic = new MessageTopic(identifier, 3, bufferSize);
         topic.collectStatistics = collectStatistics;
         return topic;
     }
