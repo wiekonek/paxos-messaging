@@ -13,6 +13,6 @@ public class SimpleSubscriber extends PaxosWorker {
 
     @Override
     public void measuredRun() {
-        topic.registerSubscriber(msg -> {/*log(msg.toString());*/});
+        topic.registerSubscriber(msg -> {/*log(msg.toString());*/}, true);
     }
 }

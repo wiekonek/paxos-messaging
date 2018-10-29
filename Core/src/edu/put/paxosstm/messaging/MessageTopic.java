@@ -48,36 +48,43 @@ public class MessageTopic extends TransactionStatisticsCollector implements MTop
 
     @Override
     public void registerSubscriber(MessageConsumer subscriber) {
+        registerSubscriber(subscriber, false);
+    }
+
+    @Override
+    public void registerSubscriber(MessageConsumer subscriber, boolean fromOldest) {
         Thread thread = new Thread(() -> {
-            final MessageWithIndex[] msg = new MessageWithIndex[1];
+            final int[] index = {0};
 
-            new CoreTransaction(true) {
-                int retryNumber = 0;
+            if(!fromOldest) {
+                new CoreTransaction(true) {
+                    int retryNumber = 0;
 
-                @Override
-                public void atomic() {
-                    retryNumber++;
-                    msg[0] = tHelper.getNewest();
-                    if (msg[0] == null) {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+                    @Override
+                    public void atomic() {
+                        retryNumber++;
+                        MessageWithIndex msg = tHelper.getNewest();
+                        if (msg == null) {
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (retryNumber > maxRetryNumber) rollback();
+
+                            retry();
                         }
-
-                        if (retryNumber > maxRetryNumber) rollback();
-
-                        retry();
+                        index[0] = msg.getIndex();
+                        subscriber.consumeMessage(msg);
                     }
-                }
-            };
+                };
+            }
 
 
-            final int[] index = {msg[0].getIndex()};
-            subscriber.consumeMessage(msg[0]);
-
+            final boolean[] end = {false};
             while (true) {
-                msg[0] = null;
+                end[0] = false;
                 new CoreTransaction(true) {
                     int retryNumber = 0;
 
@@ -85,25 +92,27 @@ public class MessageTopic extends TransactionStatisticsCollector implements MTop
                     public void atomic() {
                         retryNumber++;
                         index[0]++;
-                        msg[0] = tHelper.get(index[0]);
-                        if (msg[0] == null) {
+                        MessageWithIndex msg = tHelper.get(index[0]);
+                        if (msg == null) {
                             try {
                                 Thread.sleep(100);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
 
-                            if (retryNumber > maxRetryNumber) rollback();
+                            if (retryNumber > maxRetryNumber) {
+                                end[0] = true;
+                                rollback();
+                            }
                             index[0]--;
                             retry();
                         }
-                        index[0] = msg[0].getIndex();
+                        index[0] = msg.getIndex();
+                        subscriber.consumeMessage(msg);
                     }
 
                 };
-                if (msg[0] == null) break;
-
-                subscriber.consumeMessage(msg[0]);
+                if (end[0]) break;
             }
 
         });
@@ -117,7 +126,6 @@ public class MessageTopic extends TransactionStatisticsCollector implements MTop
 
     @Override
     public void clean() {
-        System.out.println("Cleaning!!!");
         new Transaction() {
             @Override
             public void atomic() {

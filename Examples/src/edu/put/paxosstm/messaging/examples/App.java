@@ -15,6 +15,7 @@ public class App extends MessagingApp {
     public void application(String[] params) {
         try {
             MQueue queue = messagingContext.createQueue("test-queue", new MQueueParams(MQueueType.Simple, 10));
+            MQueue otherQueue = messagingContext.createQueue("test-queue", new MQueueParams(MQueueType.Simple, 10));
 
             Thread[] threads = new Thread[3];
             threads[0] = new Thread(() -> queue.runConsumer(new MessageLogger(String.format("[%d]", nodeId))));
@@ -28,6 +29,7 @@ public class App extends MessagingApp {
                     thread.start();
                 }
             }
+
 
             for (Thread thread : threads) {
                 if (thread != null) {

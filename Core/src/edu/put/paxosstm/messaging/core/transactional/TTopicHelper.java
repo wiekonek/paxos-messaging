@@ -31,15 +31,6 @@ public class TTopicHelper {
         );
     }
 
-    public MessageWithIndex getOldest() {
-        if (newestIndex == -1) return null;
-        if(newestIndex < bufferSize) {
-            return new MessageWithIndex(tArray.get(0), 0);
-        }
-        int oldest = newestIndex - bufferSize + 1;
-        return new MessageWithIndex(tArray.get(oldest), oldest);
-    }
-
     public MessageWithIndex get(int i) {
         if (newestIndex == -1 || i > newestIndex) {
             return null;
